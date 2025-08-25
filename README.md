@@ -61,6 +61,8 @@ php artisan vendor:publish --tag="oneclicklogin-config"
 
 ## ⚡ Quick Start
 
+> 📖 **Need more examples?** Check out our [Examples Gallery](https://github.com/Grazulex/laravel-oneclicklogin/wiki/Examples-SPA) for e-commerce, SPA, and multi-tenant scenarios.
+
 ### 🚀 Basic Usage
 
 ```php
@@ -148,6 +150,8 @@ $link = OneClickLogin::create($user, [
 • PHP 8.3+
 • Laravel 11.0+ | 12.0+
 
+> 📋 **Compatibility Matrix**: See our [Installation Guide](https://github.com/Grazulex/laravel-oneclicklogin/wiki/Installation) for detailed Laravel/PHP compatibility.
+
 ## 📚 Complete Documentation
 
 For comprehensive documentation, examples, and advanced usage guides, visit our Wiki:
@@ -156,16 +160,15 @@ For comprehensive documentation, examples, and advanced usage guides, visit our 
 
 The wiki includes:
 
-• 🚀 [Installation & Setup](https://github.com/Grazulex/laravel-oneclicklogin/wiki/Install)
+• 🚀 [Installation & Setup](https://github.com/Grazulex/laravel-oneclicklogin/wiki/Installation)
 • ⚙️ [Configuration](https://github.com/Grazulex/laravel-oneclicklogin/wiki/Configuration)
-• 🎯 [Quickstart Guide](https://github.com/Grazulex/laravel-oneclicklogin/wiki/Quickstart)
-• 🌐 [API Endpoints](https://github.com/Grazulex/laravel-oneclicklogin/wiki/Endpoints)
-• 📋 [API Reference](https://github.com/Grazulex/laravel-oneclicklogin/wiki/API)
-• 🛡️ [Security Features](https://github.com/Grazulex/laravel-oneclicklogin/wiki/Security)
-• 📡 [Events & Observability](https://github.com/Grazulex/laravel-oneclicklogin/wiki/Events)
-• 🎨 [CLI Commands](https://github.com/Grazulex/laravel-oneclicklogin/wiki/CLI)
-• 📈 [Version Matrix](https://github.com/Grazulex/laravel-oneclicklogin/wiki/Version-Matrix)
-• 📝 [Changelog](https://github.com/Grazulex/laravel-oneclicklogin/wiki/Changelog)
+• 🎯 [Quick Start Guide](https://github.com/Grazulex/laravel-oneclicklogin/wiki/Quick-Start)
+• 🔗 [Link Creation Options](https://github.com/Grazulex/laravel-oneclicklogin/wiki/Link-Creation-Options)
+• 📋 [API Reference](https://github.com/Grazulex/laravel-oneclicklogin/wiki/API-Reference)
+• ⌨️ [Console Commands](https://github.com/Grazulex/laravel-oneclicklogin/wiki/Console-Commands)
+• � [Examples](https://github.com/Grazulex/laravel-oneclicklogin/wiki/Examples-SPA)
+• 🔧 [Troubleshooting](https://github.com/Grazulex/laravel-oneclicklogin/wiki/Troubleshooting)
+• ❓ [FAQ](https://github.com/Grazulex/laravel-oneclicklogin/wiki/FAQ)
 
 ## 🎨 Artisan Commands
 
@@ -245,7 +248,7 @@ class YourTest extends TestCase {
 }
 ```
 
-👉 **Full troubleshooting guide**: [docs/Troubleshooting.md](docs/Troubleshooting.md)
+👉 **Full troubleshooting guide**: [Wiki Troubleshooting](https://github.com/Grazulex/laravel-oneclicklogin/wiki/Troubleshooting)
 
 ## 🧪 Testing
 
@@ -255,7 +258,7 @@ composer test
 
 ## 🤝 Contributing
 
-Please see [CONTRIBUTING.md](https://github.com/Grazulex/laravel-oneclicklogin/blob/main/CONTRIBUTING.md) for details.
+Please see the [Contributing Guide](CONTRIBUTING.md) for details.
 
 ## 🔒 Security
 
@@ -263,7 +266,7 @@ If you discover any security-related issues, please email [jms@grazulex.be](mail
 
 ## 📝 Changelog
 
-Please see the [Wiki Changelog](https://github.com/Grazulex/laravel-oneclicklogin/wiki/Changelog) for more information on what has changed recently.
+Please see the [Changelog](https://github.com/Grazulex/laravel-oneclicklogin/wiki/Home) for more information on what has changed recently.
 
 ## 📄 License
 
