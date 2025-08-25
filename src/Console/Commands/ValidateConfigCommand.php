@@ -73,7 +73,7 @@ class ValidateConfigCommand extends Command
 
     protected function validateTokenLength(): void
     {
-        $length = Config::get('oneclicklogin.token_length');
+        $length = Config::get('oneclicklogin.security.token_length');
 
         $this->line("Validating token length: {$length} characters");
 

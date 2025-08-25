@@ -121,7 +121,7 @@ return [
         // Hash algorithm for tokens (sha256, bcrypt, argon2id)
         'hash_algorithm' => env('ONECLICKLOGIN_HASH_ALGORITHM', 'sha256'),
         // Token length in bytes (minimum 32 for security)
-        'token_length' => env('ONECLICKLOGIN_TOKEN_LENGTH', 32),
+        'token_length' => (int) env('ONECLICKLOGIN_TOKEN_LENGTH', 32),
         // Enable signed URLs for additional protection
         'signed_urls' => env('ONECLICKLOGIN_SIGNED_URLS', true),
         // Require HTTPS for magic links

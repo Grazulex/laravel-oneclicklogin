@@ -29,7 +29,7 @@ class MagicLinkBuilder
         $this->email = $email;
 
         // Set default TTL
-        $defaultTtl = config('oneclicklogin.ttl_minutes', 60);
+        $defaultTtl = (int) config('oneclicklogin.ttl_minutes', 60);
         $this->expiresAt = now()->addMinutes($defaultTtl);
     }
 
