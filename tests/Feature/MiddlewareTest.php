@@ -33,7 +33,7 @@ it('applies rate limiting to magic link verification', function (): void {
                 ->assertJson([
                     'success' => false,
                 ]);
-            
+
             // Check that the message contains the rate limit text (timing may vary slightly)
             $responseData = $response->json();
             expect($responseData['message'])->toContain('Too many attempts. Please try again in');
