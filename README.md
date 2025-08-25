@@ -1,24 +1,39 @@
 # Laravel OneClickLogin
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/grazulex/laravel-oneclicklogin.svg?style=flat-square)](https://packagist.org/packages/grazulex/laravel-oneclicklogin)
-[![Total Downloads](https://img.shields.io/packagist/dt/grazulex/laravel-oneclicklogin.svg?style=flat-square)](https://packagist.org/packages/grazulex/laravel-oneclicklogin)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/grazulex/laravel-oneclicklogin/tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/grazulex/laravel-oneclicklogin/actions?query=workflow%3Atests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/grazulex/laravel-oneclicklogin/code-quality.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/grazulex/laravel-oneclicklogin/actions?query=workflow%3Acode-quality+branch%3Amain)
+![Laravel OneClickLogin](https://raw.githubusercontent.com/Grazulex/laravel-oneclicklogin/main/new_logo.png)
 
-Passwordless authentication for Laravel applications via "magic links" - secure, single-use, time-limited URLs that provide seamless user login without passwords.
+**Passwordless authentication via magic links for Laravel applications - secure, single-use, time-limited URLs for seamless user login.**
 
-## Features
+A powerful Laravel package for creating passwordless authentication with comprehensive security features and audit trails.
 
-- 🔐 **Passwordless Authentication** - Replace or complement password-based login
-- 🔒 **Security-by-Default** - Signed, hashed tokens with short expirations and single-use
-- ⚡ **Developer Experience** - Fluent API, Facade, Artisan commands, events, and test helpers
-- 🎭 **MultiPersona Integration** - Include persona/tenant/role context in magic links
-- 📊 **ShareLink Integration** - Optional delivery layer with audit trails and analytics
-- 🚀 **Laravel Native** - Integrates seamlessly with Auth, Notifications, and Middleware
+[![Latest Version](https://img.shields.io/packagist/v/grazulex/laravel-oneclicklogin.svg?style=flat-square)](https://packagist.org/packages/grazulex/laravel-oneclicklogin) [![Total Downloads](https://img.shields.io/packagist/dt/grazulex/laravel-oneclicklogin.svg?style=flat-square)](https://packagist.org/packages/grazulex/laravel-oneclicklogin) [![License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](https://github.com/Grazulex/laravel-oneclicklogin/blob/main/LICENSE.md) [![PHP Version](https://img.shields.io/badge/php-8.3%2B-blue.svg?style=flat-square)](https://php.net/) [![Laravel Version](https://img.shields.io/badge/laravel-11.0%2B%20%7C%2012.0%2B-red.svg?style=flat-square)](https://laravel.com/) [![Tests](https://img.shields.io/github/actions/workflow/status/grazulex/laravel-oneclicklogin/tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/grazulex/laravel-oneclicklogin/actions) [![Code Style](https://img.shields.io/badge/code%20style-pint-orange.svg?style=flat-square)](https://github.com/laravel/pint)
 
-## Installation
+## 🚀 Overview
 
-You can install the package via composer:
+Laravel OneClickLogin is a comprehensive package for implementing passwordless authentication in your Laravel applications. Perfect for creating secure, time-limited magic links that provide seamless user login without passwords, with complete audit trails and advanced security features.
+
+## ✨ Key Features
+
+• 🔐 **Passwordless Authentication** - Replace or complement password-based login
+• ⏰ **Time-Limited Access** - Set expiration dates and usage limits  
+• 🔒 **Security-by-Default** - Signed, hashed tokens with short expirations
+• 🚫 **Rate Limiting** - Per-email and per-IP rate limiting to prevent abuse
+• 🌐 **IP & Device Binding** - Optional IP address and device fingerprint binding
+• 🔏 **Signed URLs** - Laravel signed route integration for additional security
+• 🔥 **Single-Use Links** - Magic links that expire after first successful use
+• 📊 **Comprehensive Auditing** - Track access patterns, IPs, and timestamps
+• 🛡️ **Advanced Security** - OTP step-up authentication for suspicious devices
+• 🎭 **MultiPersona Integration** - Include persona/tenant/role context in links
+• 📧 **Flexible Delivery** - Support for email, SMS, and custom notification channels
+• 📋 **Management API** - Revoke and extend links programmatically
+• 🎨 **CLI Commands** - Full Artisan command support
+• � **Observability** - Built-in logging and metrics integration
+• 🔗 **ShareLink Integration** - Optional delivery layer with analytics and audit trails
+• 🧪 **Test-Friendly** - Comprehensive test coverage with easy mocking
+
+## 📦 Installation
+
+Install the package via Composer:
 
 ```bash
 composer require grazulex/laravel-oneclicklogin
@@ -31,37 +46,64 @@ php artisan vendor:publish --tag="oneclicklogin-migrations"
 php artisan migrate
 ```
 
-Optionally, you can publish the config file:
+Optionally, publish the configuration file:
 
 ```bash
 php artisan vendor:publish --tag="oneclicklogin-config"
 ```
 
-## Usage
+> 💡 **Auto-Discovery**: The service provider will be automatically registered thanks to Laravel's package auto-discovery.
 
-### Basic Magic Link Creation
+## ⚡ Quick Start
+
+### 🚀 Basic Usage
 
 ```php
 use Grazulex\OneClickLogin\Facades\OneClickLogin;
 
-// Send a magic link via email
+// Send a magic link with expiration
+$link = OneClickLogin::to($user)
+    ->via('mail')
+    ->expireIn(15) // 15 minutes
+    ->withContext(['redirect' => '/dashboard'])
+    ->send();
+
+echo $link->getSignedUrl(); // https://yourapp.com/login/magic?token=abc123xyz
+```
+
+### 📧 Email Magic Links
+
+```php
+// Send via email with custom context
 OneClickLogin::to($user)
     ->via('mail')
-    ->expireIn(15) // minutes
+    ->expireIn(30) // 30 minutes
+    ->maxUses(1)
     ->withContext([
-        'redirect' => '/dashboard',
+        'redirect' => '/profile',
         'remember' => true
     ])
     ->send();
 ```
 
-### Advanced Usage with MultiPersona
+### 📱 SMS Magic Links
 
 ```php
+// Send via SMS
+OneClickLogin::to($user)
+    ->via('sms')
+    ->expireIn(10) // 10 minutes
+    ->withContext(['redirect' => '/mobile-dashboard'])
+    ->send();
+```
+
+### 🎭 MultiPersona Integration
+
+```php
+// Magic link with persona context
 OneClickLogin::to($user)
     ->via('mail')
     ->expireIn(30)
-    ->maxUses(1)
     ->withContext([
         'persona' => 'client',
         'tenant'  => 123,
@@ -74,35 +116,74 @@ OneClickLogin::to($user)
     ->send();
 ```
 
-### Creating Without Sending
+### 🔥 Advanced Security Features
 
 ```php
-$link = OneClickLogin::create($user, options: [
+// Secure magic link with IP restrictions and OTP step-up
+OneClickLogin::to($user)
+    ->via('mail')
+    ->expireIn(15)
+    ->bindIp() // Bind to current IP
+    ->bindDevice($request) // Bind to device fingerprint
+    ->withContext([
+        'redirect' => '/secure-area',
+        'otp_required' => true // Require OTP for suspicious access
+    ])
+    ->send();
+
+// Create without sending for custom delivery
+$link = OneClickLogin::create($user, [
     'ttl' => 30,
     'context' => ['redirect' => '/billing'],
 ]);
-
-// Get the magic URL
-$magicUrl = $link->getSignedUrl();
 ```
 
-### Artisan Commands
+## 🔧 Requirements
+
+• PHP 8.3+
+• Laravel 11.0+ | 12.0+
+
+## 📚 Complete Documentation
+
+For comprehensive documentation, examples, and advanced usage guides, visit our Wiki:
+
+### 📖 [👉 Laravel OneClickLogin Wiki](https://github.com/Grazulex/laravel-oneclicklogin/wiki)
+
+The wiki includes:
+
+• 🚀 [Installation & Setup](https://github.com/Grazulex/laravel-oneclicklogin/wiki/Install)
+• ⚙️ [Configuration](https://github.com/Grazulex/laravel-oneclicklogin/wiki/Configuration)
+• 🎯 [Quickstart Guide](https://github.com/Grazulex/laravel-oneclicklogin/wiki/Quickstart)
+• 🌐 [API Endpoints](https://github.com/Grazulex/laravel-oneclicklogin/wiki/Endpoints)
+• 📋 [API Reference](https://github.com/Grazulex/laravel-oneclicklogin/wiki/API)
+• 🛡️ [Security Features](https://github.com/Grazulex/laravel-oneclicklogin/wiki/Security)
+• 📡 [Events & Observability](https://github.com/Grazulex/laravel-oneclicklogin/wiki/Events)
+• 🎨 [CLI Commands](https://github.com/Grazulex/laravel-oneclicklogin/wiki/CLI)
+• 📈 [Version Matrix](https://github.com/Grazulex/laravel-oneclicklogin/wiki/Version-Matrix)
+• 📝 [Changelog](https://github.com/Grazulex/laravel-oneclicklogin/wiki/Changelog)
+
+## 🎨 Artisan Commands
+
+Laravel OneClickLogin includes powerful CLI commands for managing your magic links:
 
 ```bash
 # Send a magic link
 php artisan oneclicklogin:send user@example.com --via=mail --ttl=15
 
-# Revoke a magic link
-php artisan oneclicklogin:revoke {link-id}
+# List all magic links
+php artisan oneclicklogin:list --active --expired
+
+# Revoke a specific link
+php artisan oneclicklogin:revoke abc123xyz
 
 # Clean up expired links
-php artisan oneclicklogin:prune
+php artisan oneclicklogin:prune --days=7
 
 # Test magic link generation
 php artisan oneclicklogin:test user@example.com
 ```
 
-## Configuration
+## 🔧 Configuration
 
 The package comes with sensible defaults, but you can customize everything:
 
@@ -112,13 +193,13 @@ return [
     'ttl_minutes' => 15,
     'max_uses' => 1,
     'guard' => 'web',
-    'ip_binding' => false,
-    'device_binding' => false,
-    'enable_otp_step_up' => false,
     
-    'multi_persona' => [
-        'enabled' => true,
-        'keys' => ['persona', 'tenant', 'role'],
+    'security' => [
+        'ip_binding' => false,
+        'device_binding' => false,
+        'enable_otp_step_up' => false,
+        'hash_algorithm' => 'sha256',
+        'signed_urls' => true,
     ],
     
     'rate_limit' => [
@@ -126,53 +207,46 @@ return [
         'consume_per_ip_per_min' => 20,
     ],
     
-    // ... more options
+    'multi_persona' => [
+        'enabled' => true,
+        'keys' => ['persona', 'tenant', 'role'],
+    ],
 ];
 ```
 
-## Security Features
-
-- **Token Hashing** - Raw tokens are never stored; only SHA-256 hashes
-- **Short TTL** - Default 15-minute expiration
-- **Single Use** - Links are revoked after first successful use
-- **Rate Limiting** - Built-in protection against abuse
-- **IP/Device Binding** - Optional additional security layers
-- **Signed URLs** - Protection against URL tampering
-- **OTP Step-up** - Optional second factor for suspicious access
-
-## Events
-
-The package emits several events for observability:
-
-- `MagicLinkCreated` - When a magic link is created
-- `MagicLinkSent` - When a magic link is sent via notification
-- `MagicLinkUsed` - When a magic link is successfully used
-- `MagicLinkExpired` - When a magic link expires
-- `MagicLinkRevoked` - When a magic link is revoked
-
-## Testing
+## 🧪 Testing
 
 ```bash
 composer test
 ```
 
-## Changelog
+## 🤝 Contributing
 
-Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
+Please see [CONTRIBUTING.md](https://github.com/Grazulex/laravel-oneclicklogin/blob/main/CONTRIBUTING.md) for details.
 
-## Contributing
+## 🔒 Security
 
-Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
+If you discover any security-related issues, please email [jms@grazulex.be](mailto:jms@grazulex.be) instead of using the issue tracker.
 
-## Security Vulnerabilities
+## 📝 Changelog
 
-Please review [our security policy](../../security/policy) on how to report security vulnerabilities.
+Please see the [Wiki Changelog](https://github.com/Grazulex/laravel-oneclicklogin/wiki/Changelog) for more information on what has changed recently.
 
-## Credits
+## 📄 License
 
-- [Jean-Marc Strauven](https://github.com/grazulex)
-- [All Contributors](../../contributors)
+The MIT License (MIT). Please see [License File](https://github.com/Grazulex/laravel-oneclicklogin/blob/main/LICENSE.md) for more information.
 
-## License
+## 👥 Credits
 
-The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
+• [Jean-Marc Strauven](https://github.com/Grazulex)
+• [All Contributors](https://github.com/Grazulex/laravel-oneclicklogin/contributors)
+
+## 💬 Support
+
+• 🐛 [Report Issues](https://github.com/Grazulex/laravel-oneclicklogin/issues)
+• 💬 [Discussions](https://github.com/Grazulex/laravel-oneclicklogin/discussions)
+• 📖 [Documentation](https://github.com/Grazulex/laravel-oneclicklogin/wiki)
+
+---
+
+**Laravel OneClickLogin** - Passwordless authentication for Laravel applications with comprehensive security features and audit trails.
