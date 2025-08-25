@@ -42,7 +42,7 @@ This file serves as the navigation structure for the Laravel OneClickLogin docum
 composer require grazulex/laravel-oneclicklogin
 
 # Publish configuration
-php artisan vendor:publish --provider="Grazulex\OneClickLogin\ShareLinkServiceProvider"
+php artisan vendor:publish --provider="Grazulex\OneClickLogin\OneClickLoginServiceProvider"
 
 # Run migrations
 php artisan migrate
@@ -74,9 +74,9 @@ if ($consumer->isValid() && $consumer->canUse()) {
 
 #### Configuration Highlights
 ```php
-// config/sharelink.php
+// config/oneclicklogin.php
 return [
-    'default_expiration_minutes' => 15,
+    'ttl_minutes' => 15,
     'table_name' => 'magic_links',
     'cleanup' => ['enabled' => true],
     'rate_limiting' => ['enabled' => true],

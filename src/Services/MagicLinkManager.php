@@ -62,8 +62,8 @@ class MagicLinkManager
      */
     public function revoke(string $token): MagicLink
     {
-        // Find the magic link by verifying the token
-        $links = MagicLink::all();
+        // Find the magic link by verifying the token against unused links only
+        $links = MagicLink::whereNull('used_at')->get();
 
         foreach ($links as $link) {
             if ($link->verifyToken($token)) {
@@ -73,6 +73,6 @@ class MagicLinkManager
             }
         }
 
-        throw new \Illuminate\Database\Eloquent\ModelNotFoundException();
+        throw new \Illuminate\Database\Eloquent\ModelNotFoundException('Magic link not found or already used');
     }
 }

@@ -610,14 +610,14 @@ Recent Activity (Last 7 days):
 
 ## Configuration
 
-### Config File: `config/sharelink.php`
+### Config File: `config/oneclicklogin.php`
 
 #### Available Options
 
 ```php
 return [
     // Default expiration time in minutes
-    'default_expiration_minutes' => 15,
+    'ttl_minutes' => 15,
     
     // URL generation
     'url' => [
@@ -658,7 +658,7 @@ return [
 
 #### Configuration Details
 
-##### `default_expiration_minutes`
+##### `ttl_minutes`
 
 Default expiration time for magic links when not explicitly set.
 

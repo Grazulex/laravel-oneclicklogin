@@ -63,7 +63,7 @@ class ValidateConfigCommand extends Command
 
     protected function validateExpirationTime(): void
     {
-        $minutes = Config::get('oneclicklogin.default_expiration_minutes');
+        $minutes = Config::get('oneclicklogin.ttl_minutes');
 
         $this->line("Validating expiration time: {$minutes} minutes");
 

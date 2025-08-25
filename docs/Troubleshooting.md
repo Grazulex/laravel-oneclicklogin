@@ -92,7 +92,7 @@ dd(config('app.timezone')); // Should be correct
 2. **Verify expiration settings**
 ```php
 // Check default expiration
-dd(config('sharelink.default_expiration_minutes'));
+dd(config('oneclicklogin.ttl_minutes'));
 
 // Check specific link expiration
 $link = MagicLink::find(1);
@@ -163,7 +163,7 @@ ls database/migrations/*magic_links*
 ```php
 'providers' => [
     // ...
-    Grazulex\OneClickLogin\ShareLinkServiceProvider::class,
+    Grazulex\OneClickLogin\OneClickLoginServiceProvider::class,
 ],
 ```
 
@@ -184,7 +184,7 @@ composer show grazulex/laravel-oneclicklogin
 **Solution:**
 ```bash
 # Publish configuration
-php artisan vendor:publish --provider="Grazulex\OneClickLogin\ShareLinkServiceProvider" --tag="config"
+php artisan vendor:publish --provider="Grazulex\OneClickLogin\OneClickLoginServiceProvider" --tag="config"
 
 # Clear config cache
 php artisan config:clear
@@ -219,7 +219,7 @@ php artisan config:clear
 
 # Verify config values
 php artisan tinker
->>> config('sharelink.default_expiration_minutes')
+>>> config('oneclicklogin.ttl_minutes')
 ```
 
 ---
@@ -592,9 +592,9 @@ Route::get('/health/magic-links', function () {
     
     // Check configuration
     $checks['config'] = [
-        'default_expiration' => config('sharelink.default_expiration_minutes'),
-        'table_name' => config('sharelink.table_name'),
-        'cleanup_enabled' => config('sharelink.cleanup.enabled'),
+        'default_expiration' => config('oneclicklogin.ttl_minutes'),
+        'table_name' => config('oneclicklogin.table_name'),
+        'cleanup_enabled' => config('oneclicklogin.cleanup.enabled'),
     ];
     
     return response()->json($checks);

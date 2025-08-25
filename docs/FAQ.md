@@ -1,6 +1,11 @@
 # Frequently Asked Questions (FAQ)
 
-Common questions and answers about Laravel OneClickLogin package.
+CoYou can customize the table name in the configuration:
+
+```php
+// config/oneclicklogin.php
+'table_name' => 'custom_magic_links',
+```uestions and answers about Laravel OneClickLogin package.
 
 ## General Questions
 
@@ -39,7 +44,7 @@ No modifications to your User model are required. The package works with any mod
 Yes, you can customize the table name in the configuration:
 
 ```php
-// config/sharelink.php
+// config/oneclicklogin.php
 'table_name' => 'custom_magic_links',
 ```
 
@@ -63,8 +68,8 @@ Mail::to('user@example.com')->send(new MagicLinkMail($link));
 Magic links expire after 15 minutes by default. You can customize this:
 
 ```php
-// Global default in config/sharelink.php
-'default_expiration_minutes' => 30,
+// Global default in config/oneclicklogin.php
+'ttl_minutes' => 30,
 
 // Or per-link
 $link = OneClickLogin::for('user@example.com')
@@ -147,7 +152,7 @@ Tokens are generated using PHP's `random_bytes()` function for cryptographic sec
 The package includes configurable rate limiting:
 
 ```php
-// config/sharelink.php
+// config/oneclicklogin.php
 'rate_limiting' => [
     'enabled' => true,
     'max_attempts' => 3,
@@ -388,7 +393,7 @@ public function consume($token)
 Yes, configure the database connection:
 
 ```php
-// config/sharelink.php
+// config/oneclicklogin.php
 'connection' => 'custom_database',
 ```
 

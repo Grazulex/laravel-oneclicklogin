@@ -319,7 +319,7 @@ Configure security features for enhanced protection.
 ### IP Address Validation
 
 ```php
-// Store IP for validation (configure in config/sharelink.php)
+// Store IP for validation (configure in config/oneclicklogin.php)
 $link = OneClickLogin::for('user@example.com')
     ->context([
         'ip_address' => request()->ip(),
@@ -382,7 +382,7 @@ $link = OneClickLogin::for('user@example.com')
 ### Custom Token Length
 
 ```php
-// Configure in config/sharelink.php
+// Configure in config/oneclicklogin.php
 'token' => [
     'length' => 128, // Longer token for higher security
     'hash_algo' => 'sha256',

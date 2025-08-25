@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 return [
     // Time-to-live for magic links in minutes
-    'ttl_minutes' => env('ONECLICKLOGIN_TTL_MINUTES', 15),
+    'ttl_minutes' => (int) env('ONECLICKLOGIN_TTL_MINUTES', 15),
 
     // Maximum number of uses per magic link
-    'max_uses' => env('ONECLICKLOGIN_MAX_USES', 1),
+    'max_uses' => (int) env('ONECLICKLOGIN_MAX_USES', 1),
 
     // Route name for consuming magic links
     'signed_route_name' => 'oneclicklogin.consume',
