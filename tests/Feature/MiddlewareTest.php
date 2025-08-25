@@ -8,6 +8,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
+use Mockery;
 
 uses(RefreshDatabase::class);
 
@@ -22,7 +23,7 @@ it('applies rate limiting to magic link verification', function (): void {
 
     // Make multiple requests quickly
     for ($i = 0; $i < 12; $i++) {
-        $response = $this->get('/magic-link/verify/invalid-token');
+        $response = $this->get('/magic-link/verify/invalidtoken123');
 
         if ($i < 10) {
             // First 10 requests should be processed normally
@@ -32,8 +33,8 @@ it('applies rate limiting to magic link verification', function (): void {
             $response->assertStatus(429)
                 ->assertJson([
                     'success' => false,
-                    'message' => fn (string $message) => str_contains($message, 'Too many attempts'),
-                ]);
+                ])
+                ->assertJsonFragment(['message' => 'Too many attempts. Please try again in 300 seconds.']);
         }
     }
 });
@@ -50,11 +51,13 @@ it('logs magic link verification attempts', function (): void {
 
     // Verify logging was called
     Log::shouldHaveReceived('info')
-        ->with('Magic link verification successful', fn (array $data) => $data['success'] === true &&
-            isset($data['token']) &&
-            isset($data['ip']) &&
-            isset($data['duration_ms'])
-        );
+        ->with('Magic link verification successful', Mockery::on(function ($data) {
+            return is_array($data)
+                && $data['success'] === true
+                && isset($data['token'])
+                && isset($data['ip'])
+                && isset($data['duration_ms']);
+        }));
 
     // Verify event was fired
     Event::assertDispatched(MagicLinkAttempt::class, function (MagicLinkAttempt $event) {
@@ -66,14 +69,16 @@ it('logs magic link verification attempts', function (): void {
 
 it('logs failed magic link verification attempts', function (): void {
     // Make a failed request
-    $this->get('/magic-link/verify/invalid-token');
+    $this->get('/magic-link/verify/invalidtoken456');
 
     // Verify warning was logged
     Log::shouldHaveReceived('warning')
-        ->with('Magic link verification failed', fn (array $data) => $data['success'] === false &&
-            isset($data['token']) &&
-            isset($data['ip'])
-        );
+        ->with('Magic link verification failed', Mockery::on(function ($data) {
+            return is_array($data)
+                && $data['success'] === false
+                && isset($data['token'])
+                && isset($data['ip']);
+        }));
 
     // Verify event was fired
     Event::assertDispatched(MagicLinkAttempt::class, function (MagicLinkAttempt $event) {
@@ -86,7 +91,7 @@ it('clears rate limiting on successful authentication', function (): void {
 
     // Make some failed attempts first
     for ($i = 0; $i < 5; $i++) {
-        $this->get('/magic-link/verify/invalid-token');
+        $this->get('/magic-link/verify/invalidtoken789');
     }
 
     // Now make a successful request
@@ -99,7 +104,7 @@ it('clears rate limiting on successful authentication', function (): void {
 
     // Should be able to make more requests without being rate limited
     for ($i = 0; $i < 8; $i++) {
-        $response = $this->get('/magic-link/verify/another-invalid-token');
+        $response = $this->get('/magic-link/verify/anotherinvalidtoken123');
         $response->assertRedirect('/login'); // Should not be rate limited
     }
 });

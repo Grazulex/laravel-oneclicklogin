@@ -30,7 +30,7 @@ it('can verify a valid magic link via HTTP', function (): void {
 });
 
 it('returns error for invalid magic link via HTTP', function (): void {
-    $response = $this->get('/magic-link/verify/invalid-token');
+    $response = $this->get('/magic-link/verify/invalidtoken123');
 
     $response->assertRedirect('/login');
     $response->assertSessionHasErrors(['magic_link']);

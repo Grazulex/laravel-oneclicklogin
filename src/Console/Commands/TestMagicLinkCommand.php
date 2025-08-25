@@ -21,7 +21,7 @@ class TestMagicLinkCommand extends Command
         $email = $this->option('email');
         $ttl = (int) $this->option('ttl');
 
-        $this->info("Testing magic link functionality for: {$email}");
+        $this->info('Testing OneClickLogin Magic Link functionality...');
 
         try {
             // Generate a test magic link
@@ -69,7 +69,7 @@ class TestMagicLinkCommand extends Command
                 return self::FAILURE;
             }
 
-            $this->info('🎉 All tests passed! Magic link functionality is working correctly.');
+            $this->info('🎉 All tests completed successfully!');
 
             return self::SUCCESS;
 

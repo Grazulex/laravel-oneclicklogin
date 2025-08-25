@@ -15,7 +15,7 @@ class MagicLinkUsed
 
     public function __construct(
         public readonly MagicLink $magicLink,
-        public readonly string $ipAddress,
+        public readonly ?string $ipAddress = null,
         public readonly ?string $userAgent = null
     ) {}
 }

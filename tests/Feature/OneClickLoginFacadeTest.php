@@ -17,7 +17,7 @@ it('can create magic links through facade', function (): void {
 
     expect($link)->toBeInstanceOf(Grazulex\OneClickLogin\Models\MagicLink::class);
     expect($link->email)->toBe('test@example.com');
-    expect($link->context)->toBe(['redirect_url' => '/dashboard']);
+    expect($link->redirect_url)->toBe('/dashboard');
 });
 
 it('can consume magic links through facade', function (): void {
@@ -37,7 +37,8 @@ it('can prune expired magic links through facade', function (): void {
     // Create a valid magic link
     $validLink = OneClickLogin::for('test2@example.com')->generate();
 
-    $prunedCount = OneClickLogin::prune();
+    // Prune with 0 days to remove all expired links regardless of age
+    $prunedCount = OneClickLogin::prune(0);
 
     expect($prunedCount)->toBe(1);
 
