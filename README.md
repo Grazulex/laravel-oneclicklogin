@@ -1,12 +1,17 @@
 # Laravel OneClickLogin
 
-![Laravel OneClickLogin](https://raw.githubusercontent.com/Grazulex/laravel-oneclicklogin/main/new_logo.png)
-
-**Passwordless authentication via magic links for Laravel applications - secure, single-use, time-limited URLs for seamless user login.**
-
-A powerful Laravel package for creating passwordless authentication with comprehensive security features and audit trails.
+<div align="center">
+  <img src="https://raw.githubusercontent.com/Grazulex/laravel-oneclicklogin/main/new_logo.png" alt="Laravel OneClickLogin" width="200">
+  
+  **Passwordless authentication via magic links for Laravel applications - secure, single-use, time-limited URLs for seamless user login.**
+  
+  *A powerful Laravel package for creating passwordless authentication with comprehensive security features and audit trails.*
 
 [![Latest Version](https://img.shields.io/packagist/v/grazulex/laravel-oneclicklogin.svg?style=flat-square)](https://packagist.org/packages/grazulex/laravel-oneclicklogin) [![Total Downloads](https://img.shields.io/packagist/dt/grazulex/laravel-oneclicklogin.svg?style=flat-square)](https://packagist.org/packages/grazulex/laravel-oneclicklogin) [![License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](https://github.com/Grazulex/laravel-oneclicklogin/blob/main/LICENSE.md) [![PHP Version](https://img.shields.io/badge/php-8.3%2B-blue.svg?style=flat-square)](https://php.net/) [![Laravel Version](https://img.shields.io/badge/laravel-11.0%2B%20%7C%2012.0%2B-red.svg?style=flat-square)](https://laravel.com/) [![Tests](https://img.shields.io/github/actions/workflow/status/grazulex/laravel-oneclicklogin/tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/grazulex/laravel-oneclicklogin/actions) [![Code Style](https://img.shields.io/badge/code%20style-pint-orange.svg?style=flat-square)](https://github.com/laravel/pint)
+
+</div>
+
+---
 
 ## 🚀 Overview
 
