@@ -15,6 +15,18 @@ return [
     // Authentication guard to use
     'guard' => env('ONECLICKLOGIN_GUARD', 'web'),
 
+    // User model class
+    'user_model' => env('ONECLICKLOGIN_USER_MODEL', 'App\\Models\\User'),
+
+    // Email field name in the user model
+    'email_field' => env('ONECLICKLOGIN_EMAIL_FIELD', 'email'),
+
+    // Allow unknown users (redirect to registration)
+    'allow_unknown_users' => env('ONECLICKLOGIN_ALLOW_UNKNOWN_USERS', false),
+
+    // Default redirect URL after successful login
+    'default_redirect_url' => env('ONECLICKLOGIN_DEFAULT_REDIRECT_URL', '/dashboard'),
+
     // IP binding - if enabled, magic links are tied to the IP address
     'ip_binding' => env('ONECLICKLOGIN_IP_BINDING', false),
 

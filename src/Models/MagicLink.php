@@ -110,11 +110,11 @@ class MagicLink extends Model
     {
         $this->used_at = now();
 
-        if ($ipAddress) {
+        if ($ipAddress !== null && $ipAddress !== '' && $ipAddress !== '0') {
             $this->ip_address = $ipAddress;
         }
 
-        if ($userAgent) {
+        if ($userAgent !== null && $userAgent !== '' && $userAgent !== '0') {
             $this->user_agent = $userAgent;
         }
 

@@ -31,17 +31,18 @@ class MagicLinkManager
     {
         $cutoff = now()->subDays($days);
 
-        return MagicLink::where(function ($query) use ($cutoff) {
+        return MagicLink::where(function ($query) use ($cutoff): void {
             $query->where('expires_at', '<', $cutoff)
                 ->orWhereNotNull('used_at');
         })->delete();
     }
 
     /**
-     * Extend a magic link expiration.
+     * Extend a magic link expiration by token.
      */
-    public function extend(MagicLink $link, int $hours): MagicLink
+    public function extend(string $token, int $hours): MagicLink
     {
+        $link = MagicLink::where('token_hash', hash('sha256', $token))->firstOrFail();
         $link->expires_at = $link->expires_at->addHours($hours);
         $link->save();
 
@@ -49,10 +50,11 @@ class MagicLinkManager
     }
 
     /**
-     * Revoke a magic link.
+     * Revoke a magic link by token.
      */
-    public function revoke(MagicLink $link): MagicLink
+    public function revoke(string $token): MagicLink
     {
+        $link = MagicLink::where('token_hash', hash('sha256', $token))->firstOrFail();
         $link->revoke();
 
         return $link;

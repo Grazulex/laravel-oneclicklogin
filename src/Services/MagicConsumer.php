@@ -27,7 +27,7 @@ class MagicConsumer
      */
     public function isValid(): bool
     {
-        return $this->link !== null && $this->error === null;
+        return $this->link instanceof MagicLink && $this->error === null;
     }
 
     /**
@@ -65,7 +65,7 @@ class MagicConsumer
 
         $this->link->markAsUsed($ipAddress, $userAgent);
 
-        event(new MagicLinkUsed($this->link));
+        event(new MagicLinkUsed($this->link, $ipAddress, $userAgent));
 
         return $this->link;
     }

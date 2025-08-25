@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Grazulex\OneClickLogin\Console;
+namespace Grazulex\OneClickLogin\Console\Commands;
 
 use Exception;
 use Grazulex\OneClickLogin\Services\MagicLinkManager;
 use Illuminate\Console\Command;
 
-class GenerateMagicLink extends Command
+class GenerateMagicLinkCommand extends Command
 {
     protected $signature = 'oneclicklogin:generate
                             {email : The email to generate the magic link for}

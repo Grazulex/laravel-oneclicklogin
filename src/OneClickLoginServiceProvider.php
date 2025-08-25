@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Grazulex\OneClickLogin;
 
-use Grazulex\OneClickLogin\Console\GenerateMagicLink;
-use Grazulex\OneClickLogin\Console\ListMagicLinks;
-use Grazulex\OneClickLogin\Console\PruneMagicLinks;
-use Grazulex\OneClickLogin\Console\RevokeMagicLink;
-use Grazulex\OneClickLogin\Console\TestMagicLink;
+use Grazulex\OneClickLogin\Console\Commands\GenerateMagicLinkCommand;
+use Grazulex\OneClickLogin\Console\Commands\ListMagicLinksCommand;
+use Grazulex\OneClickLogin\Console\Commands\PruneMagicLinksCommand;
+use Grazulex\OneClickLogin\Console\Commands\RevokeMagicLinkCommand;
+use Grazulex\OneClickLogin\Console\Commands\TestMagicLinkCommand;
+use Grazulex\OneClickLogin\Console\Commands\ValidateConfigCommand;
 use Grazulex\OneClickLogin\Services\MagicLinkManager;
 use Illuminate\Support\ServiceProvider;
 
@@ -33,13 +34,17 @@ class OneClickLoginServiceProvider extends ServiceProvider
             ], 'oneclicklogin-migrations');
         }
 
+        // Load routes
+        $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
+
         if ($this->app->runningInConsole()) {
             $this->commands([
-                GenerateMagicLink::class,
-                ListMagicLinks::class,
-                PruneMagicLinks::class,
-                RevokeMagicLink::class,
-                TestMagicLink::class,
+                GenerateMagicLinkCommand::class,
+                ListMagicLinksCommand::class,
+                PruneMagicLinksCommand::class,
+                RevokeMagicLinkCommand::class,
+                TestMagicLinkCommand::class,
+                ValidateConfigCommand::class,
             ]);
         }
     }

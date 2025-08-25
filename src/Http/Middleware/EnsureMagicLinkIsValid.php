@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace Grazulex\OneClickLogin\Http\Middleware;
 
 use Closure;
-use Grazulex\OneClickLogin\Services\MagicConsumer;
+use Grazulex\OneClickLogin\Services\MagicLinkManager;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\Response;
 
 class EnsureMagicLinkIsValid
 {
     public function __construct(
-        private readonly MagicConsumer $magicConsumer
+        private readonly MagicLinkManager $manager
     ) {}
 
     /**
@@ -23,19 +23,19 @@ class EnsureMagicLinkIsValid
         $token = $request->query('token');
 
         if (! $token) {
-            return redirect(config('oneclicklogin.redirect_on_invalid'))
+            return redirect(config('oneclicklogin.login_redirect_url', '/login'))
                 ->with('error', 'No magic link token provided');
         }
 
-        $result = $this->magicConsumer->consume($token, $request);
+        $consumer = $this->manager->consume($token);
 
-        if (! $result->valid) {
-            return redirect(config('oneclicklogin.redirect_on_invalid'))
-                ->with('error', $result->error ?? 'Invalid magic link');
+        if (! $consumer->isValid()) {
+            return redirect(config('oneclicklogin.login_redirect_url', '/login'))
+                ->with('error', 'Invalid magic link');
         }
 
-        // Add the result to the request for the controller
-        $request->merge(['magic_link_result' => $result]);
+        // Add the consumer to the request for the controller
+        $request->merge(['magic_link_consumer' => $consumer]);
 
         return $next($request);
     }
