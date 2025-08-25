@@ -8,7 +8,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
-use Mockery;
 
 uses(RefreshDatabase::class);
 
@@ -33,8 +32,15 @@ it('applies rate limiting to magic link verification', function (): void {
             $response->assertStatus(429)
                 ->assertJson([
                     'success' => false,
-                ])
-                ->assertJsonFragment(['message' => 'Too many attempts. Please try again in 300 seconds.']);
+                ]);
+            
+            // Check that the message contains the rate limit text (timing may vary slightly)
+            $responseData = $response->json();
+            expect($responseData['message'])->toContain('Too many attempts. Please try again in');
+            expect($responseData['message'])->toContain('seconds.');
+            expect($responseData)->toHaveKey('retry_after');
+            expect($responseData['retry_after'])->toBeGreaterThan(0);
+            expect($responseData['retry_after'])->toBeLessThanOrEqual(300);
         }
     }
 });
