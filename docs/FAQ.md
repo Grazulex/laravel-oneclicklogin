@@ -115,6 +115,67 @@ $newLink = OneClickLogin::for('user@example.com')->generate();
 
 ---
 
+## Environment & Debugging Questions ⭐ **NEW**
+
+### Why does OneClickLogin::for()->generate() fail but CLI commands work?
+
+**TL;DR**: This is almost always an environment setup issue, not a package bug.
+
+**Common scenario:**
+```php
+// ❌ This fails in your app
+$link = OneClickLogin::for('user@example.com')->generate();
+// Error: Carbon type issues, database errors, etc.
+
+// ✅ But this works
+php artisan oneclicklogin:generate user@example.com
+```
+
+**Root causes:**
+1. **Missing migrations** - `magic_links` table doesn't exist
+2. **Dirty environment** - Cached configuration or database state
+3. **Test context** - Running in wrong Laravel context
+
+**Quick fix:**
+```bash
+# Clean everything and retry
+php artisan migrate:fresh
+php artisan cache:clear
+php artisan config:clear
+
+# Then test
+php artisan tinker
+>>> OneClickLogin::for('test@example.com')->generate();
+```
+
+**For tests, always use:**
+```php
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+class YourTest extends TestCase
+{
+    use RefreshDatabase; // ← This solves 90% of issues
+}
+```
+
+### Why do I get Carbon type casting errors?
+
+These errors typically indicate environment issues, not code bugs:
+
+```
+Carbon::rawAddUnit(): Argument #3 ($value) must be of type int|float, string given
+```
+
+**Debugging steps:**
+1. Verify configuration types: `php artisan tinker --execute="var_dump(config('oneclicklogin.ttl_minutes'));"`
+2. Check database: `php artisan migrate:status`
+3. Clear environment: `php artisan config:clear && php artisan cache:clear`
+4. Test in isolation: Use `RefreshDatabase` in tests
+
+**99% of the time**: It's not a package bug, it's environment state.
+
+---
+
 ## Security Questions
 
 ### What happens if someone intercepts the email?

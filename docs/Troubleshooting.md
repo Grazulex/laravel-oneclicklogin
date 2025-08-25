@@ -4,6 +4,7 @@ This guide helps you resolve common issues with Laravel OneClickLogin package.
 
 ## Table of Contents
 
+- [Environment Setup Issues](#environment-setup-issues) ⭐ **NEW**
 - [Common Issues](#common-issues)
 - [Installation Problems](#installation-problems)
 - [Configuration Issues](#configuration-issues)
@@ -12,6 +13,85 @@ This guide helps you resolve common issues with Laravel OneClickLogin package.
 - [Performance Issues](#performance-issues)
 - [Security Concerns](#security-concerns)
 - [Debug Tools](#debug-tools)
+
+## Environment Setup Issues
+
+### API Programmatique Appears Broken (Environment Issue)
+
+**⚠️ IMPORTANT DISCOVERY**: What appears to be a bug in the programmatic API is often an environment setup issue, not a code problem.
+
+**Symptoms:**
+- `OneClickLogin::for($email)->generate()` throws exceptions
+- Carbon-related errors (type casting issues)
+- CLI commands work perfectly but facade API fails
+- Error messages like: `Carbon::rawAddUnit(): Argument #3 ($value) must be of type int|float, string given`
+
+**Root Cause:**
+This is **NOT** a bug in the package code. It's typically caused by:
+
+1. **Missing database tables** (migrations not run)
+2. **Dirty test environment** (cached data/state)
+3. **Testing in wrong context** (missing Laravel bootstrap)
+
+**Quick Diagnosis:**
+```bash
+# 1. Check if tables exist
+php artisan migrate:status
+
+# 2. Verify magic_links table exists
+php artisan tinker --execute="echo Schema::hasTable('magic_links') ? 'EXISTS' : 'MISSING';"
+
+# 3. Test CLI (should work)
+php artisan oneclicklogin:generate test@example.com --ttl=30
+
+# 4. Clean environment
+php artisan migrate:fresh
+php artisan cache:clear
+php artisan config:clear
+```
+
+**Solution:**
+```bash
+# Step 1: Ensure migrations are run
+php artisan migrate
+
+# Step 2: Clear all caches
+php artisan cache:clear
+php artisan config:clear
+php artisan view:clear
+
+# Step 3: Test in clean environment
+php artisan tinker
+>>> $link = \Grazulex\OneClickLogin\Facades\OneClickLogin::for('test@example.com')->generate();
+>>> echo "Success! Link ID: " . $link->id;
+```
+
+**For Testing:**
+```php
+// In your tests, always use RefreshDatabase
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+class MagicLinkTest extends TestCase
+{
+    use RefreshDatabase; // ← This ensures clean environment
+    
+    public function test_api_works_in_clean_environment()
+    {
+        $link = OneClickLogin::for('test@example.com')->generate();
+        $this->assertNotNull($link);
+    }
+}
+```
+
+**Debugging Methodology:**
+1. **Always test CLI first** - If CLI works but API doesn't → environment issue
+2. **Check database state** - Missing tables/dirty data causes most issues  
+3. **Use RefreshDatabase in tests** - Ensures clean slate for each test
+4. **Don't assume code bugs** - 90% of "API issues" are environment-related
+
+**Key Lesson:** Package tests pass consistently because they use proper environment setup. Manual testing often fails due to environment state issues.
+
+---
 
 ## Common Issues
 

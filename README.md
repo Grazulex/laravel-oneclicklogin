@@ -219,6 +219,34 @@ return [
 ];
 ```
 
+## 🔧 Troubleshooting
+
+### Common Issue: API vs CLI Discrepancy
+
+If `OneClickLogin::for()->generate()` fails but CLI commands work, this is typically an **environment setup issue**, not a package bug:
+
+```bash
+# Quick fix - ensure clean environment
+php artisan migrate:fresh
+php artisan cache:clear
+php artisan config:clear
+
+# Then test
+php artisan tinker
+>>> OneClickLogin::for('test@example.com')->generate();
+```
+
+**For testing, always use `RefreshDatabase`:**
+```php
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+class YourTest extends TestCase {
+    use RefreshDatabase; // ← Prevents environment issues
+}
+```
+
+👉 **Full troubleshooting guide**: [docs/Troubleshooting.md](docs/Troubleshooting.md)
+
 ## 🧪 Testing
 
 ```bash
