@@ -19,22 +19,22 @@ Laravel OneClickLogin is a comprehensive package for implementing passwordless a
 
 ## ✨ Key Features
 
-* 🔐 **Passwordless Authentication** - Replace or complement password-based login
-* ⏰ **Time-Limited Access** - Set expiration dates and usage limits  
-* 🔒 **Security-by-Default** - Signed, hashed tokens with short expirations
-* 🚫 **Rate Limiting** - Per-email and per-IP rate limiting to prevent abuse
-* 🌐 **IP & Device Binding** - Optional IP address and device fingerprint binding
-* 🔏 **Signed URLs** - Laravel signed route integration for additional security
-* 🔥 **Single-Use Links** - Magic links that expire after first successful use
-* 📊 **Comprehensive Auditing** - Track access patterns, IPs, and timestamps
-* 🛡️ **Advanced Security** - OTP step-up authentication for suspicious devices
-* 🎭 **MultiPersona Integration** - Include persona/tenant/role context in links
-* 📧 **Flexible Delivery** - Support for email, SMS, and custom notification channels
-* 📋 **Management API** - Revoke and extend links programmatically
-* 🎨 **CLI Commands** - Full Artisan command support
-* � **Observability** - Built-in logging and metrics integration
-* 🔗 **ShareLink Integration** - Optional delivery layer with analytics and audit trails
-* 🧪 **Test-Friendly** - Comprehensive test coverage with easy mocking
+- 🔐 **Passwordless Authentication** - Replace or complement password-based login
+- ⏰ **Time-Limited Access** - Set expiration dates and usage limits  
+- 🔒 **Security-by-Default** - Signed, hashed tokens with short expirations
+- 🚫 **Rate Limiting** - Per-email and per-IP rate limiting to prevent abuse
+- 🌐 **IP & Device Binding** - Optional IP address and device fingerprint binding
+- 🔏 **Signed URLs** - Laravel signed route integration for additional security
+- 🔥 **Single-Use Links** - Magic links that expire after first successful use
+- 📊 **Comprehensive Auditing** - Track access patterns, IPs, and timestamps
+- 🛡️ **Advanced Security** - OTP step-up authentication for suspicious devices
+- 🎭 **MultiPersona Integration** - Include persona/tenant/role context in links
+- 📧 **Flexible Delivery** - Support for email, SMS, and custom notification channels
+- 📋 **Management API** - Revoke and extend links programmatically
+- 🎨 **CLI Commands** - Full Artisan command support
+- � **Observability** - Built-in logging and metrics integration
+- 🔗 **ShareLink Integration** - Optional delivery layer with analytics and audit trails
+- 🧪 **Test-Friendly** - Comprehensive test coverage with easy mocking
 
 ## 📦 Installation
 
@@ -160,15 +160,15 @@ For comprehensive documentation, examples, and advanced usage guides, visit our 
 
 The wiki includes:
 
-* 🚀 [Installation & Setup](https://github.com/Grazulex/laravel-oneclicklogin/wiki/Installation)
-* ⚙️ [Configuration](https://github.com/Grazulex/laravel-oneclicklogin/wiki/Configuration)
-* 🎯 [Quick Start Guide](https://github.com/Grazulex/laravel-oneclicklogin/wiki/Quick-Start)
-* 🔗 [Link Creation Options](https://github.com/Grazulex/laravel-oneclicklogin/wiki/Link-Creation-Options)
-* 📋 [API Reference](https://github.com/Grazulex/laravel-oneclicklogin/wiki/API-Reference)
-* ⌨️ [Console Commands](https://github.com/Grazulex/laravel-oneclicklogin/wiki/Console-Commands)
-* � [Examples](https://github.com/Grazulex/laravel-oneclicklogin/wiki/Examples-SPA)
-* 🔧 [Troubleshooting](https://github.com/Grazulex/laravel-oneclicklogin/wiki/Troubleshooting)
-* ❓ [FAQ](https://github.com/Grazulex/laravel-oneclicklogin/wiki/FAQ)
+- 🚀 [Installation & Setup](https://github.com/Grazulex/laravel-oneclicklogin/wiki/Installation)
+- ⚙️ [Configuration](https://github.com/Grazulex/laravel-oneclicklogin/wiki/Configuration)
+- 🎯 [Quick Start Guide](https://github.com/Grazulex/laravel-oneclicklogin/wiki/Quick-Start)
+- 🔗 [Link Creation Options](https://github.com/Grazulex/laravel-oneclicklogin/wiki/Link-Creation-Options)
+- 📋 [API Reference](https://github.com/Grazulex/laravel-oneclicklogin/wiki/API-Reference)
+- ⌨️ [Console Commands](https://github.com/Grazulex/laravel-oneclicklogin/wiki/Console-Commands)
+- � [Examples](https://github.com/Grazulex/laravel-oneclicklogin/wiki/Examples-SPA)
+- 🔧 [Troubleshooting](https://github.com/Grazulex/laravel-oneclicklogin/wiki/Troubleshooting)
+- ❓ [FAQ](https://github.com/Grazulex/laravel-oneclicklogin/wiki/FAQ)
 
 ## 🎨 Artisan Commands
 
