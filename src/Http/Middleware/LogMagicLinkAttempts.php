@@ -30,7 +30,7 @@ class LogMagicLinkAttempts
         $success = $this->isSuccessfulResponse($response);
 
         $logData = [
-            'token' => $token !== null && $token !== '' && $token !== '0' ? mb_substr($token, 0, 8).'...' : null,
+            'token' => ! in_array($token, [null, '', '0'], true) ? mb_substr($token, 0, 8).'...' : null,
             'ip' => $request->ip(),
             'user_agent' => $request->userAgent(),
             'success' => $success,
