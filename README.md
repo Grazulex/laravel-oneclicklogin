@@ -11,6 +11,12 @@
 
 </div>
 
+> [!TIP]
+> **What Laravel OneClickLogin does for you** — Replace passwords with secure, single-use, time-limited magic links. Users log in with one click from their inbox, and you get a full audit trail of who used which link, when and from where.
+>
+> **This package is free and maintained on my own time.** If it saves you hours, a small contribution helps me keep it going:
+> [💖 GitHub Sponsors](https://github.com/sponsors/Grazulex) · [☕ Buy Me a Coffee](https://buymeacoffee.com/grazulex) · [PayPal](https://paypal.me/strauven)
+
 ---
 
 ## 🚀 Overview
@@ -267,6 +273,14 @@ If you discover any security-related issues, please email [jms@grazulex.be](mail
 ## 📝 Changelog
 
 Please see the [Changelog](https://github.com/Grazulex/laravel-oneclicklogin/wiki/Home) for more information on what has changed recently.
+
+## 💖 Support This Package
+
+Laravel OneClickLogin is free, open source and maintained on my own time. If it saves you hours, here is how you can give back:
+
+- ⭐ **Star the repository** — it helps other developers find it
+- 🐦 **Share it** with your team and network
+- 💖 **[Sponsor on GitHub](https://github.com/sponsors/Grazulex)**, **[buy me a coffee](https://buymeacoffee.com/grazulex)** or **[donate via PayPal](https://paypal.me/strauven)** — every contribution funds maintenance, new features and Laravel upgrades
 
 ## 📄 License
 
