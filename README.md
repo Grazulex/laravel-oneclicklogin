@@ -38,7 +38,7 @@ Laravel OneClickLogin is a comprehensive package for implementing passwordless a
 - 📧 **Flexible Delivery** - Support for email, SMS, and custom notification channels
 - 📋 **Management API** - Revoke and extend links programmatically
 - 🎨 **CLI Commands** - Full Artisan command support
-- � **Observability** - Built-in logging and metrics integration
+- 📊 **Observability** - Built-in logging and metrics integration
 - 🔗 **ShareLink Integration** - Optional delivery layer with analytics and audit trails
 - 🧪 **Test-Friendly** - Comprehensive test coverage with easy mocking
 
@@ -172,7 +172,7 @@ The wiki includes:
 - 🔗 [Link Creation Options](https://github.com/Grazulex/laravel-oneclicklogin/wiki/Link-Creation-Options)
 - 📋 [API Reference](https://github.com/Grazulex/laravel-oneclicklogin/wiki/API-Reference)
 - ⌨️ [Console Commands](https://github.com/Grazulex/laravel-oneclicklogin/wiki/Console-Commands)
-- � [Examples](https://github.com/Grazulex/laravel-oneclicklogin/wiki/Examples-SPA)
+- 💡 [Examples](https://github.com/Grazulex/laravel-oneclicklogin/wiki/Examples-SPA)
 - 🔧 [Troubleshooting](https://github.com/Grazulex/laravel-oneclicklogin/wiki/Troubleshooting)
 - ❓ [FAQ](https://github.com/Grazulex/laravel-oneclicklogin/wiki/FAQ)
 
