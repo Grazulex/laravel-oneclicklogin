@@ -7,7 +7,7 @@
   
   *A powerful Laravel package for creating passwordless authentication with comprehensive security features and audit trails.*
 
-[![Latest Version](https://img.shields.io/packagist/v/grazulex/laravel-oneclicklogin.svg?style=flat-square)](https://packagist.org/packages/grazulex/laravel-oneclicklogin) [![Total Downloads](https://img.shields.io/packagist/dt/grazulex/laravel-oneclicklogin.svg?style=flat-square)](https://packagist.org/packages/grazulex/laravel-oneclicklogin) [![License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](https://github.com/Grazulex/laravel-oneclicklogin/blob/main/LICENSE.md) [![PHP Version](https://img.shields.io/badge/php-8.3%2B-blue.svg?style=flat-square)](https://php.net/) [![Laravel Version](https://img.shields.io/badge/laravel-12.0%2B%20%7C%2013.0%2B-red.svg?style=flat-square)](https://laravel.com/) [![Tests](https://img.shields.io/github/actions/workflow/status/grazulex/laravel-oneclicklogin/tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/grazulex/laravel-oneclicklogin/actions) [![Code Style](https://img.shields.io/badge/code%20style-pint-orange.svg?style=flat-square)](https://github.com/laravel/pint)
+[![Latest Version](https://img.shields.io/packagist/v/grazulex/laravel-oneclicklogin.svg?style=flat-square)](https://packagist.org/packages/grazulex/laravel-oneclicklogin) [![Total Downloads](https://img.shields.io/packagist/dt/grazulex/laravel-oneclicklogin.svg?style=flat-square)](https://packagist.org/packages/grazulex/laravel-oneclicklogin) [![License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](https://github.com/Grazulex/laravel-oneclicklogin/blob/main/LICENSE.md) [![PHP Version](https://img.shields.io/badge/php-8.4%2B-blue.svg?style=flat-square)](https://php.net/) [![Laravel Version](https://img.shields.io/badge/laravel-12.0%2B%20%7C%2013.0%2B-red.svg?style=flat-square)](https://laravel.com/) [![Tests](https://img.shields.io/github/actions/workflow/status/grazulex/laravel-oneclicklogin/tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/grazulex/laravel-oneclicklogin/actions) [![Code Style](https://img.shields.io/badge/code%20style-pint-orange.svg?style=flat-square)](https://github.com/laravel/pint)
 
 </div>
 
@@ -153,7 +153,7 @@ $link = OneClickLogin::create($user, [
 
 ## 🔧 Requirements
 
-• PHP 8.3+
+• PHP 8.4+
 • Laravel 12.0+ | 13.0+
 
 > 📋 **Compatibility Matrix**: See our [Installation Guide](https://github.com/Grazulex/laravel-oneclicklogin/wiki/Installation) for detailed Laravel/PHP compatibility.
