@@ -7,8 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.2.0] - 2026-10-08
+
 ### Changed
 
+- **Minimum PHP version is now 8.4**: PHP 8.3 is no longer supported (#6)
+- CI test matrix now runs PHP 8.4 and 8.5 (#6)
 - Rector: simplified repeated strict comparisons into `in_array(..., true)` in `MagicLink::markAsUsed()` and `LogMagicLinkAttempts`.
 - CI workflows: `actions/checkout` bumped to v5, `softprops/action-gh-release` bumped to v2.
 
@@ -45,6 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial release.
 
-[Unreleased]: https://github.com/Grazulex/laravel-oneclicklogin/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/Grazulex/laravel-oneclicklogin/compare/v1.2.0...HEAD
+[v1.2.0]: https://github.com/Grazulex/laravel-oneclicklogin/compare/v1.1.0...v1.2.0
 [v1.1.0]: https://github.com/Grazulex/laravel-oneclicklogin/compare/v1.0.0...v1.1.0
 [v1.0.0]: https://github.com/Grazulex/laravel-oneclicklogin/releases/tag/v1.0.0
