@@ -11,7 +11,7 @@ it('package is properly registered with Laravel', function () {
 it('configuration is accessible via config helper', function () {
     expect(config('oneclicklogin'))->not()->toBeNull()
         ->and(config('oneclicklogin.ttl_minutes'))->not()->toBeNull()
-        ->and(config('oneclicklogin.max_uses'))->not()->toBeNull();
+        ->and(config('oneclicklogin.signed_route_name'))->not()->toBeNull();
 });
 
 it('can access nested configuration values', function () {
@@ -22,7 +22,7 @@ it('can access nested configuration values', function () {
 
 it('configuration values have correct types', function () {
     expect(config('oneclicklogin.ttl_minutes'))->toBeInt()
-        ->and(config('oneclicklogin.max_uses'))->toBeInt()
+        ->and(config('oneclicklogin.rate_limit.consume_per_ip_per_min'))->toBeInt()
         ->and(config('oneclicklogin.guard'))->toBeString()
         ->and(config('oneclicklogin.ip_binding'))->toBeBool()
         ->and(config('oneclicklogin.multi_persona.enabled'))->toBeBool()

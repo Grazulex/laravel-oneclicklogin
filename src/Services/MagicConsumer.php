@@ -55,11 +55,20 @@ class MagicConsumer
     }
 
     /**
+     * Check if the given client (IP address / user agent) satisfies the
+     * IP and device bindings of the magic link
+     */
+    public function allowsClient(?string $ipAddress, ?string $userAgent): bool
+    {
+        return $this->link instanceof MagicLink && $this->link->allowsClient($ipAddress, $userAgent);
+    }
+
+    /**
      * Consume the magic link (mark as used)
      */
     public function consume(?string $ipAddress = null, ?string $userAgent = null): ?MagicLink
     {
-        if (! $this->canUse()) {
+        if (! $this->canUse() || ! $this->allowsClient($ipAddress, $userAgent)) {
             return null;
         }
 
@@ -75,17 +84,16 @@ class MagicConsumer
      */
     protected function validateToken(): void
     {
-        // Find magic links and check which one matches the token
-        $links = MagicLink::where('expires_at', '>', now())
-            ->whereNull('used_at')
-            ->get();
+        // Find the active magic link matching the token
+        $link = MagicLink::findByToken(
+            $this->token,
+            MagicLink::where('expires_at', '>', now())->whereNull('used_at')
+        );
 
-        foreach ($links as $link) {
-            if ($link->verifyToken($this->token)) {
-                $this->link = $link;
+        if ($link instanceof MagicLink) {
+            $this->link = $link;
 
-                return;
-            }
+            return;
         }
 
         // If we get here, no valid link was found

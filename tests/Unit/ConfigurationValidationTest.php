@@ -10,12 +10,8 @@ it('has valid default TTL configuration', function () {
         ->and($ttl)->toBeLessThanOrEqual(60); // Max 1 hour for security
 });
 
-it('has valid max uses configuration', function () {
-    $maxUses = config('oneclicklogin.max_uses');
-
-    expect($maxUses)->toBeInt()
-        ->and($maxUses)->toBeGreaterThan(0)
-        ->and($maxUses)->toBeLessThanOrEqual(10); // Reasonable limit
+it('has a supported hash algorithm configuration', function () {
+    expect(config('oneclicklogin.security.hash_algorithm'))->toBeIn(['sha256', 'bcrypt', 'argon2id']);
 });
 
 it('has valid guard configuration', function () {
@@ -30,7 +26,7 @@ it('has valid route name configuration', function () {
 
     expect($routeName)->toBeString()
         ->and($routeName)->toMatch('/^[a-zA-Z0-9._-]+$/')
-        ->and($routeName)->toContain('oneclicklogin');
+        ->and(Illuminate\Support\Facades\Route::has($routeName))->toBeTrue();
 });
 
 it('has valid redirect URLs configuration', function () {
@@ -86,7 +82,8 @@ it('has valid boolean configuration flags', function () {
     $booleanConfigs = [
         'ip_binding',
         'device_binding',
-        'enable_otp_step_up',
+        'security.signed_urls',
+        'security.require_https',
         'multi_persona.enabled',
         'observability.enabled',
         'observability.log',

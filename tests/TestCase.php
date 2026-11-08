@@ -32,6 +32,10 @@ abstract class TestCase extends Orchestra
         // Use array cache for testing to avoid database cache issues
         $app['config']->set('cache.default', 'array');
 
+        // Always start from the package defaults, ignoring any copy previously
+        // published into the testbench skeleton (it may come from an older version)
+        $app['config']->set('oneclicklogin', require __DIR__.'/../config/oneclicklogin.php');
+
         // Configure OneClickLogin to use TestUser
         $app['config']->set('oneclicklogin.user_model', 'TestUser');
         $app['config']->set('oneclicklogin.email_field', 'email');

@@ -9,27 +9,35 @@ it('can publish configuration files', function () {
         '--force' => true,
     ])->assertExitCode(0);
 
-    expect(file_exists(config_path('oneclicklogin.php')))->toBeTrue();
+    $published = config_path('oneclicklogin.php');
+
+    try {
+        expect(file_exists($published))->toBeTrue()
+            ->and(file_get_contents($published))->toBe(file_get_contents(__DIR__.'/../../config/oneclicklogin.php'));
+    } finally {
+        // Do not leave the published file in the shared testbench skeleton
+        @unlink($published);
+    }
 });
 
 it('can override configuration values', function () {
     config(['oneclicklogin.ttl_minutes' => 30]);
-    config(['oneclicklogin.max_uses' => 3]);
+    config(['oneclicklogin.rate_limit.issue_per_email_per_hour' => 3]);
     config(['oneclicklogin.guard' => 'api']);
 
     expect(config('oneclicklogin.ttl_minutes'))->toBe(30);
-    expect(config('oneclicklogin.max_uses'))->toBe(3);
+    expect(config('oneclicklogin.rate_limit.issue_per_email_per_hour'))->toBe(3);
     expect(config('oneclicklogin.guard'))->toBe('api');
 });
 
 it('validates boolean configuration values', function () {
     config(['oneclicklogin.ip_binding' => true]);
     config(['oneclicklogin.device_binding' => true]);
-    config(['oneclicklogin.enable_otp_step_up' => true]);
+    config(['oneclicklogin.security.signed_urls' => true]);
 
     expect(config('oneclicklogin.ip_binding'))->toBeTrue();
     expect(config('oneclicklogin.device_binding'))->toBeTrue();
-    expect(config('oneclicklogin.enable_otp_step_up'))->toBeTrue();
+    expect(config('oneclicklogin.security.signed_urls'))->toBeTrue();
 });
 
 it('has valid notification class configuration', function () {
@@ -43,7 +51,7 @@ it('has valid notification class configuration', function () {
 it('can handle environment variable configuration', function () {
     $envVars = [
         'ONECLICKLOGIN_TTL_MINUTES' => '25',
-        'ONECLICKLOGIN_MAX_USES' => '2',
+        'ONECLICKLOGIN_RATE_CONSUME_PER_IP_PER_MIN' => '2',
         'ONECLICKLOGIN_GUARD' => 'sanctum',
         'ONECLICKLOGIN_IP_BINDING' => 'true',
         'ONECLICKLOGIN_DEVICE_BINDING' => 'true',
@@ -55,13 +63,13 @@ it('can handle environment variable configuration', function () {
 
     // Reload config to pick up environment changes
     $this->app['config']->set('oneclicklogin.ttl_minutes', (int) env('ONECLICKLOGIN_TTL_MINUTES', 15));
-    $this->app['config']->set('oneclicklogin.max_uses', (int) env('ONECLICKLOGIN_MAX_USES', 1));
+    $this->app['config']->set('oneclicklogin.rate_limit.consume_per_ip_per_min', (int) env('ONECLICKLOGIN_RATE_CONSUME_PER_IP_PER_MIN', 20));
     $this->app['config']->set('oneclicklogin.guard', env('ONECLICKLOGIN_GUARD', 'web'));
     $this->app['config']->set('oneclicklogin.ip_binding', filter_var(env('ONECLICKLOGIN_IP_BINDING', false), FILTER_VALIDATE_BOOLEAN));
     $this->app['config']->set('oneclicklogin.device_binding', filter_var(env('ONECLICKLOGIN_DEVICE_BINDING', false), FILTER_VALIDATE_BOOLEAN));
 
     expect(config('oneclicklogin.ttl_minutes'))->toBe(25);
-    expect(config('oneclicklogin.max_uses'))->toBe(2);
+    expect(config('oneclicklogin.rate_limit.consume_per_ip_per_min'))->toBe(2);
     expect(config('oneclicklogin.guard'))->toBe('sanctum');
     expect(config('oneclicklogin.ip_binding'))->toBeTrue();
     expect(config('oneclicklogin.device_binding'))->toBeTrue();

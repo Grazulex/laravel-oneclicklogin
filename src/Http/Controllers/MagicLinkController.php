@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace Grazulex\OneClickLogin\Http\Controllers;
 
+use Grazulex\OneClickLogin\Models\MagicLink;
 use Grazulex\OneClickLogin\Services\MagicLinkManager;
+use Grazulex\OneClickLogin\Support\InvalidLinkRedirect;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\URL;
 
 class MagicLinkController
 {
@@ -21,19 +24,21 @@ class MagicLinkController
      */
     public function verify(string $token, Request $request): RedirectResponse|JsonResponse
     {
+        // Enforce HTTPS when required (security.require_https)
+        if ($this->configFlag('security.require_https') && ! $request->secure()) {
+            return $this->invalidResponse($request, 'Magic links must be opened over HTTPS', 403);
+        }
+
+        // Enforce the URL signature when signed URLs are enabled (security.signed_urls)
+        if ($this->configFlag('security.signed_urls') && ! URL::hasValidSignature($request, false)) {
+            return $this->invalidResponse($request, 'Invalid or expired magic link signature', 403);
+        }
+
         $consumer = $this->manager->consume($token);
 
         // Check if the magic link is valid
         if (! $consumer->isValid()) {
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => $consumer->getError() ?? 'Invalid magic link',
-                ], 400);
-            }
-
-            return redirect()->route('login')
-                ->withErrors(['magic_link' => $consumer->getError() ?? 'Invalid magic link']);
+            return $this->invalidResponse($request, $consumer->getError() ?? 'Invalid magic link', 400);
         }
 
         // Check if it can be used
@@ -45,14 +50,19 @@ class MagicLinkController
                 ], 400);
             }
 
-            return redirect()->route('login')
+            return redirect()->to(InvalidLinkRedirect::url())
                 ->withErrors(['magic_link' => 'This magic link has already been used']);
+        }
+
+        // Check IP / device bindings (ip_binding, device_binding)
+        if (! $consumer->allowsClient($request->ip(), $request->userAgent())) {
+            return $this->invalidResponse($request, 'This magic link cannot be used from this device or network', 403);
         }
 
         // Consume the magic link
         $link = $consumer->consume($request->ip(), $request->userAgent());
 
-        if (! $link instanceof \Grazulex\OneClickLogin\Models\MagicLink) {
+        if (! $link instanceof MagicLink) {
             if ($request->expectsJson()) {
                 return response()->json([
                     'success' => false,
@@ -60,7 +70,7 @@ class MagicLinkController
                 ], 500);
             }
 
-            return redirect()->route('login')
+            return redirect()->to(InvalidLinkRedirect::url())
                 ->withErrors(['magic_link' => 'Something went wrong']);
         }
 
@@ -115,7 +125,7 @@ class MagicLinkController
             ], 404);
         }
 
-        return redirect()->route('login')
+        return redirect()->to(InvalidLinkRedirect::url())
             ->withErrors(['magic_link' => 'No account found with this email address']);
     }
 
@@ -128,5 +138,26 @@ class MagicLinkController
         $emailField = config('oneclicklogin.email_field', 'email');
 
         return $userModel::where($emailField, $email)->first();
+    }
+
+    /**
+     * Build the response for a rejected magic link (redirect_on_invalid for HTML requests)
+     */
+    protected function invalidResponse(Request $request, string $message, int $status): RedirectResponse|JsonResponse
+    {
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => false,
+                'message' => $message,
+            ], $status);
+        }
+
+        return redirect()->to(InvalidLinkRedirect::url())
+            ->withErrors(['magic_link' => $message]);
+    }
+
+    protected function configFlag(string $key): bool
+    {
+        return filter_var(config('oneclicklogin.'.$key, false), FILTER_VALIDATE_BOOLEAN);
     }
 }

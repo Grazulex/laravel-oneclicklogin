@@ -33,7 +33,7 @@ Laravel OneClickLogin is a comprehensive package for implementing passwordless a
 - 🔏 **Signed URLs** - Laravel signed route integration for additional security
 - 🔥 **Single-Use Links** - Magic links that expire after first successful use
 - 📊 **Comprehensive Auditing** - Track access patterns, IPs, and timestamps
-- 🛡️ **Advanced Security** - OTP step-up authentication for suspicious devices
+- 🛡️ **Advanced Security** - Configurable token hashing (sha256, bcrypt, argon2id) and HTTPS enforcement
 - 🎭 **MultiPersona Integration** - Include persona/tenant/role context in links
 - 📧 **Flexible Delivery** - Support for email, SMS, and custom notification channels
 - 📋 **Management API** - Revoke and extend links programmatically
@@ -132,17 +132,13 @@ OneClickLogin::to($user)
 ### 🔥 Advanced Security Features
 
 ```php
-// Secure magic link with IP restrictions and OTP step-up
-OneClickLogin::to($user)
-    ->via('mail')
-    ->expireIn(15)
-    ->bindIp() // Bind to current IP
-    ->bindDevice($request) // Bind to device fingerprint
-    ->withContext([
-        'redirect' => '/secure-area',
-        'otp_required' => true // Require OTP for suspicious access
-    ])
-    ->send();
+// Secure magic link bound to the requester's IP address and device
+$link = OneClickLogin::for($user->email)
+    ->expiresInMinutes(15)
+    ->bindToIp() // Bind to the current request IP
+    ->bindToDevice() // Bind to the current request user agent
+    ->redirectTo('/secure-area')
+    ->generate();
 
 // Create without sending for custom delivery
 $link = OneClickLogin::create($user, [
@@ -205,15 +201,16 @@ The package comes with sensible defaults, but you can customize everything:
 // config/oneclicklogin.php
 return [
     'ttl_minutes' => 15,
-    'max_uses' => 1,
     'guard' => 'web',
+    'signed_route_name' => 'magic-link.verify',
+    'ip_binding' => false,
+    'device_binding' => false,
+    'redirect_on_invalid' => '/login?invalid=1',
     
     'security' => [
-        'ip_binding' => false,
-        'device_binding' => false,
-        'enable_otp_step_up' => false,
         'hash_algorithm' => 'sha256',
-        'signed_urls' => true,
+        'signed_urls' => false,
+        'require_https' => false,
     ],
     
     'rate_limit' => [

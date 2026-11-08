@@ -7,6 +7,7 @@ namespace Grazulex\OneClickLogin\Console\Commands;
 use DB;
 use Exception;
 use Grazulex\OneClickLogin\Support\ConfigValidator;
+use Grazulex\OneClickLogin\Support\InvalidLinkRedirect;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Config;
 use Schema;
@@ -27,6 +28,7 @@ class ValidateConfigCommand extends Command
             $this->validateExpirationTime();
             $this->validateTokenLength();
             $this->validateRedirectUrls();
+            $this->validateHashAlgorithm();
             $this->validateDatabase();
 
             $this->info('✅ Configuration validation passed!');
@@ -84,14 +86,24 @@ class ValidateConfigCommand extends Command
     protected function validateRedirectUrls(): void
     {
         $defaultUrl = Config::get('oneclicklogin.default_redirect_url');
-        $loginUrl = Config::get('oneclicklogin.login_redirect_url');
+        $invalidUrl = InvalidLinkRedirect::url();
 
         $this->line('Validating redirect URLs...');
 
         ConfigValidator::validateRedirectUrl($defaultUrl);
-        ConfigValidator::validateRedirectUrl($loginUrl);
+        ConfigValidator::validateRedirectUrl($invalidUrl);
 
         $this->line('✓ Redirect URLs are valid');
+    }
+
+    protected function validateHashAlgorithm(): void
+    {
+        $algorithm = (string) Config::get('oneclicklogin.security.hash_algorithm', 'sha256');
+
+        $this->line("Validating hash algorithm: {$algorithm}");
+
+        ConfigValidator::validateHashAlgorithm($algorithm);
+        $this->line('✓ Hash algorithm is valid');
     }
 
     protected function validateDatabase(): void

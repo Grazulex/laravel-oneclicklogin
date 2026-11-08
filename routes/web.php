@@ -15,7 +15,7 @@ Route::middleware(['web'])
             ->name('verify')
             ->where('token', '[a-zA-Z0-9]+')
             ->middleware([
-                RateLimitMagicLinks::class.':10,5', // 10 attempts per 5 minutes
+                RateLimitMagicLinks::class, // rate_limit.consume_per_ip_per_min attempts per minute
                 LogMagicLinkAttempts::class,
             ]);
     });

@@ -24,6 +24,10 @@ class MagicLinkBuilder
 
     protected array $meta = [];
 
+    protected ?string $boundIp = null;
+
+    protected ?string $boundUserAgent = null;
+
     public function __construct(string $email)
     {
         $this->email = $email;
@@ -84,6 +88,28 @@ class MagicLinkBuilder
     }
 
     /**
+     * Bind the magic link to an IP address (defaults to the current request IP).
+     * The link can then only be consumed from that IP address.
+     */
+    public function bindToIp(?string $ipAddress = null): self
+    {
+        $this->boundIp = $ipAddress ?? request()->ip();
+
+        return $this;
+    }
+
+    /**
+     * Bind the magic link to a device user agent (defaults to the current request user agent).
+     * The link can then only be consumed from that device.
+     */
+    public function bindToDevice(?string $userAgent = null): self
+    {
+        $this->boundUserAgent = $userAgent ?? request()->userAgent();
+
+        return $this;
+    }
+
+    /**
      * Add context data for the magic link
      */
     public function withContext(array $context): self
@@ -125,13 +151,27 @@ class MagicLinkBuilder
      */
     protected function createMagicLink(): MagicLink
     {
-        $link = new MagicLink([
+        $attributes = [
             'email' => $this->email,
             'redirect_url' => $this->redirectUrl ?? config('oneclicklogin.default_redirect_url', '/'),
             'expires_at' => $this->expiresAt,
             'context' => $this->context,
             'meta' => $this->meta,
-        ]);
+        ];
+
+        // IP / device binding: stored in ip_address / user_agent until the link is used
+        $boundIp = $this->boundIp ?? ($this->autoBindingEnabled('ip_binding') ? request()->ip() : null);
+        $boundUserAgent = $this->boundUserAgent ?? ($this->autoBindingEnabled('device_binding') ? request()->userAgent() : null);
+
+        if (! in_array($boundIp, [null, ''], true)) {
+            $attributes['ip_address'] = $boundIp;
+        }
+
+        if (! in_array($boundUserAgent, [null, ''], true)) {
+            $attributes['user_agent'] = $boundUserAgent;
+        }
+
+        $link = new MagicLink($attributes);
 
         // Generate token and hash before saving
         $link->generateToken();
@@ -141,17 +181,43 @@ class MagicLinkBuilder
     }
 
     /**
+     * Whether a binding option is enabled and a client request is available
+     * (links generated from the console or queued jobs are never bound automatically).
+     * The option is read at the top level, or under `security` as an alias.
+     */
+    protected function autoBindingEnabled(string $option): bool
+    {
+        $enabled = filter_var(config('oneclicklogin.'.$option, false), FILTER_VALIDATE_BOOLEAN)
+            || filter_var(config('oneclicklogin.security.'.$option, false), FILTER_VALIDATE_BOOLEAN);
+
+        return $enabled && ! app()->runningInConsole();
+    }
+
+    /**
      * Check if the email is rate limited
+     *
+     * Reads `rate_limit.issue_per_email_per_hour`. The legacy `rate_limiting.*` keys
+     * (`enabled`, `max_attempts`, `decay_minutes`) are still honored when set.
      */
     protected function isRateLimited(): bool
     {
-        if (! config('oneclicklogin.rate_limiting.enabled', true)) {
+        $legacy = config('oneclicklogin.rate_limiting');
+        $legacy = is_array($legacy) ? $legacy : [];
+
+        if (array_key_exists('enabled', $legacy) && ! filter_var($legacy['enabled'], FILTER_VALIDATE_BOOLEAN)) {
             return false;
         }
 
+        $maxAttempts = (int) ($legacy['max_attempts'] ?? config('oneclicklogin.rate_limit.issue_per_email_per_hour', 5));
+        $decayMinutes = (int) ($legacy['decay_minutes'] ?? 60);
+
+        // A limit of 0 (or less) disables rate limiting
+        if ($maxAttempts <= 0) {
+            return false;
+        }
+
+        $decayMinutes = max(1, $decayMinutes);
         $key = 'oneclicklogin:'.$this->email;
-        $maxAttempts = config('oneclicklogin.rate_limiting.max_attempts', 5);
-        $decayMinutes = config('oneclicklogin.rate_limiting.decay_minutes', 60);
 
         if (RateLimiter::tooManyAttempts($key, $maxAttempts)) {
             return true;

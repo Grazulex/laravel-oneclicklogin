@@ -58,6 +58,13 @@ class ConfigValidator
         }
     }
 
+    public static function validateHashAlgorithm(string $algorithm): void
+    {
+        if (! in_array(mb_strtolower($algorithm), ['sha256', 'bcrypt', 'argon2id'], true)) {
+            throw new InvalidArgumentException("Unsupported hash algorithm [{$algorithm}]. Supported: sha256, bcrypt, argon2id.");
+        }
+    }
+
     public static function validateRedirectUrl(?string $url): void
     {
         if ($url === null) {
