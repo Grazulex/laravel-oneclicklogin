@@ -43,15 +43,13 @@ class MagicLinkManager
     public function extend(string $token, int $hours): MagicLink
     {
         // Find the magic link by verifying the token
-        $links = MagicLink::all();
+        $link = MagicLink::findByToken($token);
 
-        foreach ($links as $link) {
-            if ($link->verifyToken($token)) {
-                $link->expires_at = $link->expires_at->addHours($hours);
-                $link->save();
+        if ($link instanceof MagicLink) {
+            $link->expires_at = $link->expires_at->addHours($hours);
+            $link->save();
 
-                return $link;
-            }
+            return $link;
         }
 
         throw new \Illuminate\Database\Eloquent\ModelNotFoundException();
@@ -63,14 +61,12 @@ class MagicLinkManager
     public function revoke(string $token): MagicLink
     {
         // Find the magic link by verifying the token against unused links only
-        $links = MagicLink::whereNull('used_at')->get();
+        $link = MagicLink::findByToken($token, MagicLink::whereNull('used_at'));
 
-        foreach ($links as $link) {
-            if ($link->verifyToken($token)) {
-                $link->revoke();
+        if ($link instanceof MagicLink) {
+            $link->revoke();
 
-                return $link;
-            }
+            return $link;
         }
 
         throw new \Illuminate\Database\Eloquent\ModelNotFoundException('Magic link not found or already used');

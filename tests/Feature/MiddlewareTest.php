@@ -18,6 +18,8 @@ beforeEach(function (): void {
 });
 
 it('applies rate limiting to magic link verification', function (): void {
+    config(['oneclicklogin.rate_limit.consume_per_ip_per_min' => 10]);
+
     $user = createTestUser('test@example.com');
 
     // Make multiple requests quickly
@@ -26,7 +28,7 @@ it('applies rate limiting to magic link verification', function (): void {
 
         if ($i < 10) {
             // First 10 requests should be processed normally
-            $response->assertRedirect('/login');
+            $response->assertRedirect('/login?invalid=1');
         } else {
             // 11th and 12th requests should be rate limited
             $response->assertStatus(429)
@@ -40,7 +42,7 @@ it('applies rate limiting to magic link verification', function (): void {
             expect($responseData['message'])->toContain('seconds.');
             expect($responseData)->toHaveKey('retry_after');
             expect($responseData['retry_after'])->toBeGreaterThan(0);
-            expect($responseData['retry_after'])->toBeLessThanOrEqual(300);
+            expect($responseData['retry_after'])->toBeLessThanOrEqual(60);
         }
     }
 });
@@ -100,6 +102,6 @@ it('clears rate limiting on successful authentication', function (): void {
     // Should be able to make more requests without being rate limited
     for ($i = 0; $i < 8; $i++) {
         $response = $this->get('/magic-link/verify/anotherinvalidtoken123');
-        $response->assertRedirect('/login'); // Should not be rate limited
+        $response->assertRedirect('/login?invalid=1'); // Should not be rate limited
     }
 });

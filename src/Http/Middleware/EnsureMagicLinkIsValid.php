@@ -6,6 +6,7 @@ namespace Grazulex\OneClickLogin\Http\Middleware;
 
 use Closure;
 use Grazulex\OneClickLogin\Services\MagicLinkManager;
+use Grazulex\OneClickLogin\Support\InvalidLinkRedirect;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -23,14 +24,14 @@ class EnsureMagicLinkIsValid
         $token = $request->query('token');
 
         if (! $token) {
-            return redirect(config('oneclicklogin.login_redirect_url', '/login'))
+            return redirect(InvalidLinkRedirect::url())
                 ->with('error', 'No magic link token provided');
         }
 
         $consumer = $this->manager->consume($token);
 
         if (! $consumer->isValid()) {
-            return redirect(config('oneclicklogin.login_redirect_url', '/login'))
+            return redirect(InvalidLinkRedirect::url())
                 ->with('error', 'Invalid magic link');
         }
 

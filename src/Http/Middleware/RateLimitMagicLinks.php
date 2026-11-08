@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Grazulex\OneClickLogin\Http\Middleware;
 
 use Closure;
+use Grazulex\OneClickLogin\Support\InvalidLinkRedirect;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\RateLimiter;
@@ -12,8 +13,25 @@ use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
 class RateLimitMagicLinks
 {
-    public function handle(Request $request, Closure $next, int $maxAttempts = 5, int $decayMinutes = 60): HttpResponse
+    /**
+     * When no attempt count is given (or 0), the limit is read from
+     * `rate_limit.consume_per_ip_per_min` with a 1 minute window. A configured
+     * limit of 0 disables rate limiting. Explicit parameters keep a 60 minute
+     * default window.
+     */
+    public function handle(Request $request, Closure $next, int $maxAttempts = 0, int $decayMinutes = 0): HttpResponse
     {
+        if ($maxAttempts <= 0) {
+            $maxAttempts = (int) config('oneclicklogin.rate_limit.consume_per_ip_per_min', 20);
+            $decayMinutes = $decayMinutes > 0 ? $decayMinutes : 1;
+
+            if ($maxAttempts <= 0) {
+                return $next($request);
+            }
+        } elseif ($decayMinutes <= 0) {
+            $decayMinutes = 60;
+        }
+
         $key = $this->resolveRequestSignature($request);
 
         if (RateLimiter::tooManyAttempts($key, $maxAttempts)) {
@@ -31,7 +49,7 @@ class RateLimitMagicLinks
         $response = $next($request);
 
         // Clear rate limiting on successful authentication
-        if ($response->getStatusCode() === 302 && ! str_contains($response->headers->get('location', ''), '/login')) {
+        if ($response->getStatusCode() === 302 && ! InvalidLinkRedirect::isFailureLocation($response->headers->get('location'))) {
             RateLimiter::clear($key);
         }
 

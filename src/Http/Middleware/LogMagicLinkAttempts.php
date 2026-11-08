@@ -6,6 +6,7 @@ namespace Grazulex\OneClickLogin\Http\Middleware;
 
 use Closure;
 use Grazulex\OneClickLogin\Events\MagicLinkAttempt;
+use Grazulex\OneClickLogin\Support\InvalidLinkRedirect;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
@@ -61,9 +62,7 @@ class LogMagicLinkAttempts
 
         // Check for successful redirect (not to login page)
         if ($statusCode === 302) {
-            $location = $response->headers->get('location', '');
-
-            return ! str_contains($location, '/login');
+            return ! InvalidLinkRedirect::isFailureLocation($response->headers->get('location'));
         }
 
         // Check for successful JSON response

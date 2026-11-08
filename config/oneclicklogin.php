@@ -6,11 +6,11 @@ return [
     // Time-to-live for magic links in minutes
     'ttl_minutes' => (int) env('ONECLICKLOGIN_TTL_MINUTES', 15),
 
-    // Maximum number of uses per magic link
-    'max_uses' => (int) env('ONECLICKLOGIN_MAX_USES', 1),
+    // Magic links are single-use: a link is consumed on its first successful use.
 
-    // Route name for consuming magic links
-    'signed_route_name' => 'oneclicklogin.consume',
+    // Route name used to build magic link URLs.
+    // Falls back to the package route 'magic-link.verify' when this route does not exist.
+    'signed_route_name' => env('ONECLICKLOGIN_SIGNED_ROUTE_NAME', 'magic-link.verify'),
 
     // Authentication guard to use
     'guard' => env('ONECLICKLOGIN_GUARD', 'web'),
@@ -27,17 +27,13 @@ return [
     // Default redirect URL after successful login
     'default_redirect_url' => env('ONECLICKLOGIN_DEFAULT_REDIRECT_URL', '/dashboard'),
 
-    // IP binding - if enabled, magic links are tied to the IP address
+    // IP binding - if enabled, links generated during an HTTP request are tied to
+    // the requester's IP address and can only be consumed from that IP
     'ip_binding' => env('ONECLICKLOGIN_IP_BINDING', false),
 
-    // Device binding - if enabled, magic links are tied to device fingerprint
+    // Device binding - if enabled, links generated during an HTTP request are tied to
+    // the requester's user agent and can only be consumed from that device
     'device_binding' => env('ONECLICKLOGIN_DEVICE_BINDING', false),
-
-    // Enable OTP step-up authentication for suspicious devices
-    'enable_otp_step_up' => env('ONECLICKLOGIN_ENABLE_OTP_STEP_UP', false),
-
-    // OTP provider (if step-up is enabled)
-    'otp_provider' => env('ONECLICKLOGIN_OTP_PROVIDER', null),
 
     // MultiPersona integration
     'multi_persona' => [
@@ -47,6 +43,7 @@ return [
 
     // Redirect URLs
     'redirect_after_login' => env('ONECLICKLOGIN_REDIRECT_AFTER_LOGIN', '/'),
+    // Where browsers are sent when a magic link is rejected (invalid, expired, used...)
     'redirect_on_invalid' => env('ONECLICKLOGIN_REDIRECT_ON_INVALID', '/login?invalid=1'),
 
     // Notification classes
@@ -55,10 +52,12 @@ return [
         'sms' => env('ONECLICKLOGIN_SMS_NOTIFICATION', 'App\Notifications\MagicLinkSms'),
     ],
 
-    // Rate limiting
+    // Rate limiting (set a value to 0 to disable that limit)
     'rate_limit' => [
-        'issue_per_email_per_hour' => env('ONECLICKLOGIN_RATE_ISSUE_PER_EMAIL_PER_HOUR', 5),
-        'consume_per_ip_per_min' => env('ONECLICKLOGIN_RATE_CONSUME_PER_IP_PER_MIN', 20),
+        // Magic links generated per email address per hour
+        'issue_per_email_per_hour' => (int) env('ONECLICKLOGIN_RATE_ISSUE_PER_EMAIL_PER_HOUR', 5),
+        // Verification attempts per client (IP + user agent) per minute
+        'consume_per_ip_per_min' => (int) env('ONECLICKLOGIN_RATE_CONSUME_PER_IP_PER_MIN', 20),
     ],
 
     // Routes configuration
@@ -118,13 +117,15 @@ return [
 
     // Security settings
     'security' => [
-        // Hash algorithm for tokens (sha256, bcrypt, argon2id)
+        // Hash algorithm for stored tokens (sha256, bcrypt, argon2id).
+        // Links hashed with another algorithm remain valid.
         'hash_algorithm' => env('ONECLICKLOGIN_HASH_ALGORITHM', 'sha256'),
         // Token length in bytes (minimum 32 for security)
         'token_length' => (int) env('ONECLICKLOGIN_TOKEN_LENGTH', 32),
-        // Enable signed URLs for additional protection
-        'signed_urls' => env('ONECLICKLOGIN_SIGNED_URLS', true),
-        // Require HTTPS for magic links
-        'require_https' => env('ONECLICKLOGIN_REQUIRE_HTTPS', true),
+        // Sign magic link URLs (expiring with the link) and reject unsigned or tampered URLs
+        'signed_urls' => env('ONECLICKLOGIN_SIGNED_URLS', false),
+        // Generate https:// magic link URLs and reject verification over plain HTTP
+        // (behind a proxy, make sure TrustProxies is configured)
+        'require_https' => env('ONECLICKLOGIN_REQUIRE_HTTPS', false),
     ],
 ];

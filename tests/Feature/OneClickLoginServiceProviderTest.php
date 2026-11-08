@@ -13,17 +13,24 @@ it('can load the service provider', function () {
 it('registers the configuration correctly', function () {
     expect(config('oneclicklogin'))->toBeArray();
     expect(config('oneclicklogin.ttl_minutes'))->toBe(15);
-    expect(config('oneclicklogin.max_uses'))->toBe(1);
     expect(config('oneclicklogin.guard'))->toBe('web');
-    expect(config('oneclicklogin.signed_route_name'))->toBe('oneclicklogin.consume');
+    expect(config('oneclicklogin.signed_route_name'))->toBe('magic-link.verify');
 });
 
 it('has correct default configuration values', function () {
     expect(config('oneclicklogin.ip_binding'))->toBeFalse();
     expect(config('oneclicklogin.device_binding'))->toBeFalse();
-    expect(config('oneclicklogin.enable_otp_step_up'))->toBeFalse();
     expect(config('oneclicklogin.redirect_after_login'))->toBe('/');
     expect(config('oneclicklogin.redirect_on_invalid'))->toBe('/login?invalid=1');
+    expect(config('oneclicklogin.security.hash_algorithm'))->toBe('sha256');
+    expect(config('oneclicklogin.security.signed_urls'))->toBeFalse();
+    expect(config('oneclicklogin.security.require_https'))->toBeFalse();
+});
+
+it('no longer ships unimplemented options', function () {
+    expect(config('oneclicklogin.max_uses'))->toBeNull();
+    expect(config('oneclicklogin.enable_otp_step_up'))->toBeNull();
+    expect(config('oneclicklogin.otp_provider'))->toBeNull();
 });
 
 it('has correct multi persona configuration', function () {
