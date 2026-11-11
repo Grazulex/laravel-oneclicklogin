@@ -28,11 +28,19 @@ class OneClickLoginServiceProvider extends ServiceProvider
             __DIR__.'/../config/oneclicklogin.php' => config_path('oneclicklogin.php'),
         ], 'oneclicklogin-config');
 
+        $upgradeMigration = [
+            __DIR__.'/../database/migrations/add_token_lookup_to_magic_links_table.php' => database_path('migrations/'.date('Y_m_d_His', time() + 1).'_add_token_lookup_to_magic_links_table.php'),
+        ];
+
         if (! class_exists('CreateMagicLinksTable')) {
             $this->publishes([
                 __DIR__.'/../database/migrations/create_magic_links_table.php' => database_path('migrations/'.date('Y_m_d_His').'_create_magic_links_table.php'),
+                ...$upgradeMigration,
             ], 'oneclicklogin-migrations');
         }
+
+        // Upgrade path for installations whose magic_links table predates token_lookup
+        $this->publishes($upgradeMigration, 'oneclicklogin-upgrade-migrations');
 
         // Load routes
         $this->loadRoutesFrom(__DIR__.'/../routes/web.php');

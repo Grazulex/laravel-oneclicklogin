@@ -120,6 +120,11 @@ return [
         // Hash algorithm for stored tokens (sha256, bcrypt, argon2id).
         // Links hashed with another algorithm remain valid.
         'hash_algorithm' => env('ONECLICKLOGIN_HASH_ALGORITHM', 'sha256'),
+        // Links are found through the indexed token_lookup column. Links created
+        // before that column existed (bcrypt/argon2id hashes without token_lookup)
+        // can only be found by verifying them one by one: disable this once they
+        // have all expired or been pruned.
+        'legacy_token_scan' => env('ONECLICKLOGIN_LEGACY_TOKEN_SCAN', true),
         // Token length in bytes (minimum 32 for security)
         'token_length' => (int) env('ONECLICKLOGIN_TOKEN_LENGTH', 32),
         // Sign magic link URLs (expiring with the link) and reject unsigned or tampered URLs

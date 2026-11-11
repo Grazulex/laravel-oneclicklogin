@@ -84,7 +84,7 @@ class MagicConsumer
      */
     protected function validateToken(): void
     {
-        // Find the active magic link matching the token
+        // Find the active magic link matching the token (single indexed lookup)
         $link = MagicLink::findByToken(
             $this->token,
             MagicLink::where('expires_at', '>', now())->whereNull('used_at')
