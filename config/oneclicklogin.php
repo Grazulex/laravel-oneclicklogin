@@ -46,11 +46,17 @@ return [
     // Where browsers are sent when a magic link is rejected (invalid, expired, used...)
     'redirect_on_invalid' => env('ONECLICKLOGIN_REDIRECT_ON_INVALID', '/login?invalid=1'),
 
-    // Notification classes
+    // Notification class used by send() for each delivery channel (->via('mail'), ->via('sms')...).
+    // Classes receive the MagicLink as constructor argument. When a configured class
+    // does not exist, the package notification of that channel is used.
     'notifications' => [
-        'mail' => env('ONECLICKLOGIN_MAIL_NOTIFICATION', 'App\Notifications\MagicLinkMail'),
-        'sms' => env('ONECLICKLOGIN_SMS_NOTIFICATION', 'App\Notifications\MagicLinkSms'),
+        'mail' => env('ONECLICKLOGIN_MAIL_NOTIFICATION', 'Grazulex\OneClickLogin\Notifications\MagicLinkMail'),
+        'sms' => env('ONECLICKLOGIN_SMS_NOTIFICATION', 'Grazulex\OneClickLogin\Notifications\MagicLinkSms'),
     ],
+
+    // Notification channel used by the package SMS notification (e.g. 'vonage', 'twilio',
+    // or a custom channel class). The SMS channel package itself must be installed separately.
+    'sms_channel' => env('ONECLICKLOGIN_SMS_CHANNEL', 'vonage'),
 
     // Rate limiting (set a value to 0 to disable that limit)
     'rate_limit' => [

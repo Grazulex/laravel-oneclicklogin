@@ -44,8 +44,10 @@ it('has valid notification class configuration', function () {
     $mailNotification = config('oneclicklogin.notifications.mail');
     $smsNotification = config('oneclicklogin.notifications.sms');
 
-    expect($mailNotification)->toBe('App\Notifications\MagicLinkMail');
-    expect($smsNotification)->toBe('App\Notifications\MagicLinkSms');
+    expect($mailNotification)->toBe(Grazulex\OneClickLogin\Notifications\MagicLinkMail::class);
+    expect($smsNotification)->toBe(Grazulex\OneClickLogin\Notifications\MagicLinkSms::class);
+    expect(class_exists($mailNotification))->toBeTrue();
+    expect(class_exists($smsNotification))->toBeTrue();
 });
 
 it('can handle environment variable configuration', function () {

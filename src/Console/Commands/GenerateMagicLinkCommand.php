@@ -14,7 +14,8 @@ class GenerateMagicLinkCommand extends Command
                             {email : The email to generate the magic link for}
                             {--url=/ : The URL to redirect to after login}
                             {--ttl= : Time to live in minutes}
-                            {--force : Skip rate limiting}';
+                            {--force : Skip rate limiting}
+                            {--send : Email the link to the address (notifications.mail class)}';
 
     protected $description = 'Generate a magic link for the specified email';
 
@@ -42,11 +43,21 @@ class GenerateMagicLinkCommand extends Command
                 $builder->skipRateLimit();
             }
 
+            if ($this->option('send')) {
+                $link = $builder->via('mail')->send();
+
+                $this->info("Magic link generated for {$email}");
+                $this->line("Link: {$link->url}");
+                $this->info("Magic link sent by email to {$email}");
+
+                return self::SUCCESS;
+            }
+
             $link = $builder->generate();
 
             $this->info("Magic link generated for {$email}");
             $this->line("Link: {$link->url}");
-            $this->comment('💡 The link has been generated. You need to send it to the user via your preferred method (email, SMS, etc.)');
+            $this->comment('💡 The link has been generated. Use --send to email it, or send it via your preferred method (SMS, etc.)');
 
             return self::SUCCESS;
         } catch (Exception $e) {

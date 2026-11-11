@@ -8,11 +8,36 @@ use Carbon\Carbon;
 use Exception;
 use Grazulex\OneClickLogin\Events\MagicLinkCreated;
 use Grazulex\OneClickLogin\Models\MagicLink;
+use Grazulex\OneClickLogin\Notifications\MagicLinkMail;
+use Grazulex\OneClickLogin\Notifications\MagicLinkSms;
+use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\Notification as NotificationFacade;
 use Illuminate\Support\Facades\RateLimiter;
+use InvalidArgumentException;
+use ReflectionClass;
 
 class MagicLinkBuilder
 {
+    /**
+     * Notification classes used when the configured one does not exist.
+     *
+     * @var array<string, class-string<Notification>>
+     */
+    public const DEFAULT_NOTIFICATIONS = [
+        'mail' => MagicLinkMail::class,
+        'sms' => MagicLinkSms::class,
+    ];
+
     protected string $email;
+
+    protected ?object $notifiable = null;
+
+    /**
+     * Delivery channels used by send() (keys of the `notifications` configuration).
+     *
+     * @var array<int, string>
+     */
+    protected array $channels = ['mail'];
 
     protected ?string $redirectUrl = null;
 
@@ -130,6 +155,81 @@ class MagicLinkBuilder
     }
 
     /**
+     * Set the recipient notified by send() (e.g. a user using the Notifiable trait).
+     * Without a recipient, send() emails the link to the builder email address.
+     */
+    public function to(object $notifiable): self
+    {
+        $this->notifiable = $notifiable;
+
+        return $this;
+    }
+
+    /**
+     * Set the delivery channels used by send(): 'mail', 'sms' or any other key
+     * of the `notifications` configuration.
+     *
+     * @param  string|array<int, string>  $channels
+     */
+    public function via(string|array ...$channels): self
+    {
+        $flattened = [];
+
+        array_walk_recursive($channels, function (mixed $channel) use (&$flattened): void {
+            if (is_string($channel) && mb_trim($channel) !== '') {
+                $flattened[] = mb_trim($channel);
+            }
+        });
+
+        if ($flattened === []) {
+            throw new InvalidArgumentException('At least one delivery channel is required.');
+        }
+
+        $this->channels = array_values(array_unique($flattened));
+
+        return $this;
+    }
+
+    /**
+     * Generate the magic link and deliver it through the selected channels.
+     *
+     * Each channel uses the notification class configured under
+     * `notifications.<channel>` (the package notification when that class does
+     * not exist). The configuration is checked before the link is generated.
+     *
+     * @throws InvalidArgumentException when a channel cannot be delivered
+     */
+    public function send(): MagicLink
+    {
+        $notifications = [];
+
+        foreach ($this->channels as $channel) {
+            $notifications[$channel] = $this->notificationClassFor($channel);
+        }
+
+        $routable = $this->notifiable !== null && method_exists($this->notifiable, 'routeNotificationFor');
+
+        if (! $routable && array_diff($this->channels, ['mail']) !== []) {
+            throw new InvalidArgumentException('Delivering a magic link through ['.implode(', ', array_diff($this->channels, ['mail'])).'] requires a notifiable recipient: call to($user) first.');
+        }
+
+        $link = $this->generate();
+
+        foreach ($notifications as $class) {
+            // Configured classes receive the link as first constructor argument.
+            $notification = (new ReflectionClass($class))->newInstance($link);
+
+            if ($routable) {
+                NotificationFacade::send($this->notifiable, $notification);
+            } else {
+                NotificationFacade::route('mail', $this->email)->notify($notification);
+            }
+        }
+
+        return $link;
+    }
+
+    /**
      * Generate the magic link
      */
     public function generate(): MagicLink
@@ -178,6 +278,30 @@ class MagicLinkBuilder
         $link->save();
 
         return $link;
+    }
+
+    /**
+     * Resolve the notification class delivering the link through a channel.
+     *
+     * @return class-string<Notification>
+     */
+    protected function notificationClassFor(string $channel): string
+    {
+        $configured = config('oneclicklogin.notifications.'.$channel);
+
+        if (is_string($configured) && $configured !== '' && class_exists($configured)) {
+            if (! is_subclass_of($configured, Notification::class)) {
+                throw new InvalidArgumentException("Notification class [{$configured}] for the [{$channel}] channel must extend ".Notification::class.'.');
+            }
+
+            return $configured;
+        }
+
+        if (isset(self::DEFAULT_NOTIFICATIONS[$channel])) {
+            return self::DEFAULT_NOTIFICATIONS[$channel];
+        }
+
+        throw new InvalidArgumentException("No notification class configured for the [{$channel}] delivery channel (oneclicklogin.notifications.{$channel}).");
     }
 
     /**
