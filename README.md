@@ -74,39 +74,36 @@ php artisan vendor:publish --tag="oneclicklogin-config"
 ```php
 use Grazulex\OneClickLogin\Facades\OneClickLogin;
 
-// Send a magic link with expiration
+// Generate a magic link and email it to the user
 $link = OneClickLogin::to($user)
     ->via('mail')
-    ->expireIn(15) // 15 minutes
-    ->withContext(['redirect' => '/dashboard'])
+    ->expiresInMinutes(15)
+    ->redirectTo('/dashboard')
     ->send();
 
-echo $link->getSignedUrl(); // https://yourapp.com/login/magic?token=abc123xyz
+echo $link->url; // https://yourapp.com/magic-link/verify/abc123xyz
 ```
 
 ### 📧 Email Magic Links
 
 ```php
-// Send via email with custom context
-OneClickLogin::to($user)
-    ->via('mail')
-    ->expireIn(30) // 30 minutes
-    ->maxUses(1)
-    ->withContext([
-        'redirect' => '/profile',
-        'remember' => true
-    ])
-    ->send();
+// Email the link to any address (no user model needed)
+OneClickLogin::for('user@example.com')
+    ->expiresInMinutes(30)
+    ->redirectTo('/profile')
+    ->send(); // 'mail' is the default channel
 ```
+
+The email is built by the shipped `Grazulex\OneClickLogin\Notifications\MagicLinkMail` notification. Point `notifications.mail` to your own class to customize it.
 
 ### 📱 SMS Magic Links
 
 ```php
-// Send via SMS
+// Send via SMS (requires an SMS notification channel, e.g. laravel/vonage-notification-channel)
 OneClickLogin::to($user)
     ->via('sms')
-    ->expireIn(10) // 10 minutes
-    ->withContext(['redirect' => '/mobile-dashboard'])
+    ->expiresInMinutes(10)
+    ->redirectTo('/mobile-dashboard')
     ->send();
 ```
 
@@ -116,16 +113,15 @@ OneClickLogin::to($user)
 // Magic link with persona context
 OneClickLogin::to($user)
     ->via('mail')
-    ->expireIn(30)
+    ->expiresInMinutes(30)
+    ->redirectTo('/admin/dashboard')
     ->withContext([
         'persona' => 'client',
         'tenant'  => 123,
         'role'    => 'admin',
-        'redirect'=> '/admin/dashboard',
-        'remember'=> true
     ])
-    ->bindIp() // Optional IP binding
-    ->bindDevice($request) // Optional device binding
+    ->bindToIp() // Optional IP binding
+    ->bindToDevice() // Optional device binding
     ->send();
 ```
 
@@ -140,11 +136,8 @@ $link = OneClickLogin::for($user->email)
     ->redirectTo('/secure-area')
     ->generate();
 
-// Create without sending for custom delivery
-$link = OneClickLogin::create($user, [
-    'ttl' => 30,
-    'context' => ['redirect' => '/billing'],
-]);
+// generate() creates the link without sending it, for custom delivery
+echo $link->url;
 ```
 
 ## 🔧 Requirements
@@ -177,8 +170,8 @@ The wiki includes:
 Laravel OneClickLogin includes powerful CLI commands for managing your magic links:
 
 ```bash
-# Send a magic link
-php artisan oneclicklogin:send user@example.com --via=mail --ttl=15
+# Generate a magic link and email it
+php artisan oneclicklogin:generate user@example.com --ttl=15 --send
 
 # List all magic links
 php artisan oneclicklogin:list --active --expired

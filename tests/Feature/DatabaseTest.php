@@ -11,6 +11,7 @@ it('has magic_links table with correct columns', function (): void {
     expect(Schema::hasColumn('magic_links', 'ulid'))->toBeTrue();
     expect(Schema::hasColumn('magic_links', 'email'))->toBeTrue();
     expect(Schema::hasColumn('magic_links', 'token_hash'))->toBeTrue();
+    expect(Schema::hasColumn('magic_links', 'token_lookup'))->toBeTrue();
     expect(Schema::hasColumn('magic_links', 'redirect_url'))->toBeTrue();
     expect(Schema::hasColumn('magic_links', 'expires_at'))->toBeTrue();
     expect(Schema::hasColumn('magic_links', 'used_at'))->toBeTrue();

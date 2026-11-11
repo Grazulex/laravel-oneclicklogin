@@ -20,6 +20,7 @@ use InvalidArgumentException;
  * @property string $ulid
  * @property string $email
  * @property string $token_hash
+ * @property string|null $token_lookup
  * @property string $redirect_url
  * @property Carbon $expires_at
  * @property Carbon|null $used_at
@@ -44,6 +45,7 @@ class MagicLink extends Model
     protected $fillable = [
         'email',
         'token_hash',
+        'token_lookup',
         'redirect_url',
         'expires_at',
         'used_at',
@@ -59,6 +61,13 @@ class MagicLink extends Model
         'context' => 'array',
         'meta' => 'array',
     ];
+
+    /**
+     * Detected presence of the token_lookup column, per connection and table.
+     *
+     * @var array<string, bool>
+     */
+    private static array $lookupColumnCache = [];
 
     /**
      * Hash a token using the configured algorithm (security.hash_algorithm).
@@ -78,26 +87,90 @@ class MagicLink extends Model
     }
 
     /**
+     * Compute the lookup identifier of a plain token (SHA-256), stored in the
+     * indexed token_lookup column whatever the hash algorithm.
+     */
+    public static function lookupFor(string $token): string
+    {
+        return hash('sha256', $token);
+    }
+
+    /**
+     * Whether the magic_links table has the token_lookup column
+     * (installations upgraded without running the new migration do not).
+     *
+     * Only a positive detection is cached, so running the migration takes
+     * effect without restarting long-lived processes.
+     */
+    public static function supportsTokenLookup(): bool
+    {
+        $model = static::query()->getModel();
+        $key = ($model->getConnectionName() ?? 'default').'|'.$model->getTable();
+
+        if (self::$lookupColumnCache[$key] ?? false) {
+            return true;
+        }
+
+        $exists = $model->getConnection()
+            ->getSchemaBuilder()
+            ->hasColumn($model->getTable(), 'token_lookup');
+
+        if ($exists) {
+            self::$lookupColumnCache[$key] = true;
+        }
+
+        return $exists;
+    }
+
+    /**
+     * Forget the cached token_lookup column detection (e.g. after migrating).
+     */
+    public static function flushTokenLookupCache(): void
+    {
+        self::$lookupColumnCache = [];
+    }
+
+    /**
      * Find a magic link matching the given plain token.
      *
-     * SHA-256 hashes are looked up directly; bcrypt/argon2id hashes (including
-     * links created by previous versions) are verified one by one.
+     * The link is found with a single indexed query on token_lookup (or on
+     * token_hash for SHA-256 links), then its hash is verified once. Only links
+     * created before token_lookup existed, hashed with bcrypt/argon2id, are
+     * verified one by one (see security.legacy_token_scan).
      *
      * @param  Builder<MagicLink>|null  $query
      */
     public static function findByToken(string $token, ?Builder $query = null): ?self
     {
         $query ??= static::query();
+        $lookup = static::lookupFor($token);
+        $hasLookupColumn = static::supportsTokenLookup();
 
-        $link = (clone $query)->where('token_hash', hash('sha256', $token))->first();
+        $link = (clone $query)
+            ->where(function (Builder $where) use ($lookup, $hasLookupColumn): void {
+                $where->where('token_hash', $lookup);
+
+                if ($hasLookupColumn) {
+                    $where->orWhere('token_lookup', $lookup);
+                }
+            })
+            ->first();
 
         if ($link instanceof self) {
-            return $link;
+            return $link->verifyToken($token) ? $link : null;
         }
 
-        $candidates = (clone $query)->where('token_hash', 'like', '$%')->get();
+        if (! filter_var(config('oneclicklogin.security.legacy_token_scan', true), FILTER_VALIDATE_BOOLEAN)) {
+            return null;
+        }
 
-        foreach ($candidates as $candidate) {
+        $legacy = (clone $query)->where('token_hash', 'like', '$%');
+
+        if ($hasLookupColumn) {
+            $legacy->whereNull('token_lookup');
+        }
+
+        foreach ($legacy->lazyById(100) as $candidate) {
             if ($candidate->verifyToken($token)) {
                 return $candidate;
             }
@@ -119,6 +192,10 @@ class MagicLink extends Model
     {
         $this->token = Str::random(64);
         $this->token_hash = static::hashToken($this->token);
+
+        if (static::supportsTokenLookup()) {
+            $this->token_lookup = static::lookupFor($this->token);
+        }
     }
 
     /**

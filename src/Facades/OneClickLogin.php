@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Facade;
 
 /**
  * @method static \Grazulex\OneClickLogin\Services\MagicLinkBuilder for(string $email)
+ * @method static \Grazulex\OneClickLogin\Services\MagicLinkBuilder to(object $notifiable)
  * @method static \Grazulex\OneClickLogin\Services\MagicConsumer consume(string $token)
  * @method static int prune(int $days = 7)
  * @method static \Grazulex\OneClickLogin\Models\MagicLink extend(\Grazulex\OneClickLogin\Models\MagicLink $link, int $hours)

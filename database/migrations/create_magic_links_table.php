@@ -15,6 +15,9 @@ return new class extends Migration
             $table->ulid('ulid')->unique()->index();
             $table->string('email')->index();
             $table->string('token_hash')->index();
+            // SHA-256 of the plain token: finds a link in a single indexed query,
+            // whatever the hash algorithm used for token_hash
+            $table->string('token_lookup', 64)->nullable()->index();
             $table->string('redirect_url');
             $table->timestamp('expires_at')->index();
             $table->timestamp('used_at')->nullable();
